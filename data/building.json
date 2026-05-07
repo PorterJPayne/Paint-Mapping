@@ -13,6 +13,20 @@
       "lowStock": "0",
       "location": "Lehi 1 Storage",
       "notes": "Gross. Rusty can."
+    },
+    {
+      "inventoryId": "INV-UTDR9F",
+      "color": "",
+      "code": "",
+      "kilnSpec": "",
+      "brand": "",
+      "finish": "",
+      "surface": "",
+      "hex": "#cccccc",
+      "quantity": "",
+      "lowStock": "",
+      "location": "",
+      "notes": ""
     }
   ],
   "floors": {
