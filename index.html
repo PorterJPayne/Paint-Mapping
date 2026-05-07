@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
 
 <meta charset="UTF-8">
@@ -22,6 +21,7 @@ body{
   margin:0;
   font-family:Arial,sans-serif;
   background:#f3f3f3;
+  overflow:hidden;
 }
 
 .topbar{
@@ -52,23 +52,27 @@ body{
 }
 
 .room-list{
-  width:260px;
+  width:170px;
+  min-width:170px;
   background:white;
   border-right:1px solid #ddd;
   overflow-y:auto;
-  padding:16px;
+  padding:12px;
 }
 
 .room-list h3{
   margin-top:0;
+  margin-bottom:12px;
+  font-size:15px;
 }
 
 .room-list-item{
-  padding:10px 12px;
-  border-radius:8px;
+  padding:7px 8px;
+  border-radius:6px;
   cursor:pointer;
-  margin-bottom:6px;
+  margin-bottom:4px;
   border:1px solid transparent;
+  font-size:13px;
 }
 
 .room-list-item:hover{
@@ -83,12 +87,14 @@ body{
 .layout-main{
   flex:1;
   display:flex;
+  overflow:hidden;
 }
 
 .map-section{
   flex:7;
-  overflow:auto;
-  padding:16px;
+  overflow:hidden;
+  position:relative;
+  background:#ddd;
 }
 
 .sidebar{
@@ -99,13 +105,34 @@ body{
   overflow-y:auto;
 }
 
+.map-viewport{
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  cursor:grab;
+  position:relative;
+}
+
+.map-viewport.dragging{
+  cursor:grabbing;
+}
+
+.map-transform{
+  transform-origin:0 0;
+  position:absolute;
+  left:0;
+  top:0;
+}
+
 .map-container{
   position:relative;
-  width:100%;
+  width:2000px;
+  height:743px;
 }
 
 #floorImage{
-  width:100%;
+  width:2000px;
+  height:743px;
   display:block;
   user-select:none;
   -webkit-user-drag:none;
@@ -114,8 +141,8 @@ body{
 #overlay{
   position:absolute;
   inset:0;
-  width:100%;
-  height:100%;
+  width:2000px;
+  height:743px;
 }
 
 .room{
@@ -150,6 +177,13 @@ body{
   fill:red;
   font-size:18px;
   font-weight:bold;
+}
+
+.vertex{
+  fill:#ff9800;
+  stroke:white;
+  stroke-width:2;
+  cursor:move;
 }
 
 button{
@@ -192,6 +226,7 @@ button.small-danger{
   padding:10px 14px;
   border-radius:8px;
   font-size:14px;
+  z-index:50;
 }
 
 .instructions{
@@ -306,7 +341,7 @@ textarea{
 }
 
 .search-input{
-  width:260px;
+  width:240px;
   padding:10px 12px;
   border:1px solid #ccc;
   border-radius:8px;
@@ -317,6 +352,23 @@ textarea{
   color:#1d7a34;
   font-weight:bold;
   width:60px;
+}
+
+.zoom-controls{
+  position:absolute;
+  right:14px;
+  bottom:14px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  z-index:100;
+}
+
+.zoom-controls button{
+  width:42px;
+  height:42px;
+  padding:0;
+  font-size:20px;
 }
 
 </style>
@@ -388,6 +440,13 @@ textarea{
       Cancel
     </button>
 
+    <button
+      id="resetViewBtn"
+      class="secondary"
+    >
+      Reset View
+    </button>
+
     <select id="floorSelect">
 
       <option value="1st-floor">
@@ -424,39 +483,65 @@ textarea{
 
     <section class="map-section">
 
-      <div class="map-container">
+      <div
+        id="drawStatus"
+        class="draw-status hidden"
+      >
+
+        Drawing Room...
+
+        <br><br>
+
+        ENTER = Finish
+
+        <br>
+
+        ESC = Cancel
+
+        <br>
+
+        BACKSPACE = Undo
+
+      </div>
+
+      <div
+        id="mapViewport"
+        class="map-viewport"
+      >
 
         <div
-          id="drawStatus"
-          class="draw-status hidden"
+          id="mapTransform"
+          class="map-transform"
         >
 
-          Drawing Room...
+          <div class="map-container">
 
-          <br><br>
+            <img
+              id="floorImage"
+              src="1st-floor.png"
+            >
 
-          ENTER = Finish
+            <svg
+              id="overlay"
+              viewBox="0 0 2000 743"
+              preserveAspectRatio="none"
+            ></svg>
 
-          <br>
-
-          ESC = Cancel
-
-          <br>
-
-          BACKSPACE = Undo
+          </div>
 
         </div>
 
-        <img
-          id="floorImage"
-          src="1st-floor.png"
-        >
+      </div>
 
-        <svg
-          id="overlay"
-          viewBox="0 0 2000 743"
-          preserveAspectRatio="xMidYMid meet"
-        ></svg>
+      <div class="zoom-controls">
+
+        <button id="zoomInBtn">
+          +
+        </button>
+
+        <button id="zoomOutBtn">
+          −
+        </button>
 
       </div>
 
@@ -474,11 +559,6 @@ textarea{
 
           Click a room polygon
           to view paint info.
-
-          <br><br>
-
-          Use Draw Room to
-          create new rooms.
 
         </div>
 
@@ -572,83 +652,52 @@ textarea{
 
 <script>
 
-const floorImage =
-  document.getElementById("floorImage");
+const floorImage = document.getElementById("floorImage");
+const floorSelect = document.getElementById("floorSelect");
+const overlay = document.getElementById("overlay");
 
-const floorSelect =
-  document.getElementById("floorSelect");
+const mapViewport = document.getElementById("mapViewport");
+const mapTransform = document.getElementById("mapTransform");
 
-const overlay =
-  document.getElementById("overlay");
+const zoomInBtn = document.getElementById("zoomInBtn");
+const zoomOutBtn = document.getElementById("zoomOutBtn");
+const resetViewBtn = document.getElementById("resetViewBtn");
 
-const drawBtn =
-  document.getElementById("drawBtn");
+const drawBtn = document.getElementById("drawBtn");
+const undoBtn = document.getElementById("undoBtn");
+const finishBtn = document.getElementById("finishBtn");
+const cancelBtn = document.getElementById("cancelBtn");
 
-const undoBtn =
-  document.getElementById("undoBtn");
+const drawStatus = document.getElementById("drawStatus");
 
-const finishBtn =
-  document.getElementById("finishBtn");
+const roomPanel = document.getElementById("roomPanel");
+const emptyState = document.getElementById("emptyState");
 
-const cancelBtn =
-  document.getElementById("cancelBtn");
+const roomTitle = document.getElementById("roomTitle");
+const floorLabel = document.getElementById("floorLabel");
 
-const drawStatus =
-  document.getElementById("drawStatus");
+const paintContainer = document.getElementById("paintContainer");
 
-const roomPanel =
-  document.getElementById("roomPanel");
+const notesField = document.getElementById("notesField");
+const notesDisplay = document.getElementById("notesDisplay");
 
-const emptyState =
-  document.getElementById("emptyState");
+const editBtn = document.getElementById("editBtn");
+const saveBtn = document.getElementById("saveBtn");
+const cancelEditBtn = document.getElementById("cancelEditBtn");
 
-const roomTitle =
-  document.getElementById("roomTitle");
+const deleteRoomBtn = document.getElementById("deleteRoomBtn");
 
-const floorLabel =
-  document.getElementById("floorLabel");
+const addPaintBtn = document.getElementById("addPaintBtn");
 
-const paintContainer =
-  document.getElementById("paintContainer");
+const searchInput = document.getElementById("searchInput");
 
-const notesField =
-  document.getElementById("notesField");
+const roomList = document.getElementById("roomList");
 
-const notesDisplay =
-  document.getElementById("notesDisplay");
+const saveIndicator = document.getElementById("saveIndicator");
 
-const editBtn =
-  document.getElementById("editBtn");
-
-const saveBtn =
-  document.getElementById("saveBtn");
-
-const cancelEditBtn =
-  document.getElementById("cancelEditBtn");
-
-const deleteRoomBtn =
-  document.getElementById("deleteRoomBtn");
-
-const addPaintBtn =
-  document.getElementById("addPaintBtn");
-
-const searchInput =
-  document.getElementById("searchInput");
-
-const roomList =
-  document.getElementById("roomList");
-
-const saveIndicator =
-  document.getElementById("saveIndicator");
-
-const exportBtn =
-  document.getElementById("exportBtn");
-
-const importBtn =
-  document.getElementById("importBtn");
-
-const importFile =
-  document.getElementById("importFile");
+const exportBtn = document.getElementById("exportBtn");
+const importBtn = document.getElementById("importBtn");
+const importFile = document.getElementById("importFile");
 
 let currentFloor = "1st-floor";
 let currentRoom = null;
@@ -659,6 +708,16 @@ let drawMode = false;
 let drawPoints = [];
 
 let lastSelectedRoom = {};
+
+let zoom = 1;
+let panX = 0;
+let panY = 0;
+
+let isDraggingMap = false;
+let dragStartX = 0;
+let dragStartY = 0;
+
+let draggedVertex = null;
 
 const defaultBuildingData = {
 
@@ -685,15 +744,46 @@ const defaultBuildingData = {
 
 };
 
+function updateTransform(){
+
+  mapTransform.style.transform =
+    `translate(${panX}px, ${panY}px) scale(${zoom})`;
+
+}
+
+function resetView(){
+
+  zoom = 1;
+  panX = 0;
+  panY = 0;
+
+  updateTransform();
+
+}
+
+function zoomIn(){
+
+  zoom *= 1.15;
+
+  updateTransform();
+
+}
+
+function zoomOut(){
+
+  zoom /= 1.15;
+
+  updateTransform();
+
+}
+
 function showSaved(){
 
-  saveIndicator.textContent =
-    "Saved";
+  saveIndicator.textContent = "Saved";
 
   setTimeout(()=>{
 
-    saveIndicator.textContent =
-      "";
+    saveIndicator.textContent = "";
 
   },1500);
 
@@ -702,9 +792,7 @@ function showSaved(){
 function loadData(){
 
   const saved =
-    localStorage.getItem(
-      "buildingData"
-    );
+    localStorage.getItem("buildingData");
 
   if(saved){
 
@@ -714,9 +802,7 @@ function loadData(){
 
   localStorage.setItem(
     "buildingData",
-    JSON.stringify(
-      defaultBuildingData
-    )
+    JSON.stringify(defaultBuildingData)
   );
 
   return defaultBuildingData;
@@ -738,8 +824,7 @@ function saveData(){
 
 function getCurrentFloorData(){
 
-  return buildingData
-    .floors[currentFloor];
+  return buildingData.floors[currentFloor];
 
 }
 
@@ -747,9 +832,7 @@ function getCurrentRoom(){
 
   return getCurrentFloorData()
     .rooms
-    .find(
-      room => room.id === currentRoom
-    );
+    .find(room => room.id === currentRoom);
 
 }
 
@@ -769,8 +852,7 @@ function renderRoomList(){
     const item =
       document.createElement("div");
 
-    item.className =
-      "room-list-item";
+    item.className = "room-list-item";
 
     if(room.id === currentRoom){
 
@@ -778,17 +860,13 @@ function renderRoomList(){
 
     }
 
-    item.textContent =
-      room.id;
+    item.textContent = room.id;
 
-    item.addEventListener(
-      "click",
-      ()=>{
+    item.addEventListener("click", ()=>{
 
-        selectRoom(room.id);
+      selectRoom(room.id);
 
-      }
-    );
+    });
 
     roomList.appendChild(item);
 
@@ -800,8 +878,7 @@ function renderFloor(){
 
   overlay.innerHTML = "";
 
-  const floor =
-    getCurrentFloorData();
+  const floor = getCurrentFloorData();
 
   floorImage.src = floor.image;
 
@@ -823,8 +900,7 @@ function renderFloor(){
       "room"
     );
 
-    polygon.dataset.roomId =
-      room.id;
+    polygon.dataset.roomId = room.id;
 
     polygon.addEventListener(
       "click",
@@ -839,9 +915,13 @@ function renderFloor(){
       }
     );
 
-    overlay.appendChild(
-      polygon
-    );
+    overlay.appendChild(polygon);
+
+    if(editMode && room.id === currentRoom){
+
+      renderVertices(room);
+
+    }
 
   });
 
@@ -856,6 +936,115 @@ function renderFloor(){
   renderRoomList();
 
 }
+
+function renderVertices(room){
+
+  const points =
+    room.points
+      .split(" ")
+      .map(point=>{
+
+        const [x,y] =
+          point.split(",");
+
+        return {
+          x:parseFloat(x),
+          y:parseFloat(y)
+        };
+
+      });
+
+  points.forEach((point,index)=>{
+
+    const vertex =
+      document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "circle"
+      );
+
+    vertex.setAttribute("cx", point.x);
+    vertex.setAttribute("cy", point.y);
+    vertex.setAttribute("r", 7);
+
+    vertex.setAttribute(
+      "class",
+      "vertex"
+    );
+
+    vertex.addEventListener(
+      "mousedown",
+      (event)=>{
+
+        event.stopPropagation();
+
+        draggedVertex = {
+          roomId:room.id,
+          index
+        };
+
+      }
+    );
+
+    overlay.appendChild(vertex);
+
+  });
+
+}
+
+document.addEventListener(
+  "mousemove",
+  (event)=>{
+
+    if(!draggedVertex) return;
+
+    const pt =
+      overlay.createSVGPoint();
+
+    pt.x = event.clientX;
+    pt.y = event.clientY;
+
+    const svgPoint =
+      pt.matrixTransform(
+        overlay.getScreenCTM().inverse()
+      );
+
+    const room =
+      getCurrentFloorData()
+        .rooms
+        .find(
+          room =>
+          room.id === draggedVertex.roomId
+        );
+
+    const points =
+      room.points
+        .split(" ");
+
+    points[draggedVertex.index] =
+      `${svgPoint.x},${svgPoint.y}`;
+
+    room.points =
+      points.join(" ");
+
+    renderFloor();
+
+  }
+);
+
+document.addEventListener(
+  "mouseup",
+  ()=>{
+
+    if(draggedVertex){
+
+      saveData();
+
+    }
+
+    draggedVertex = null;
+
+  }
+);
 
 function highlightSelectedRoom(){
 
@@ -887,21 +1076,15 @@ function selectRoom(roomId){
   lastSelectedRoom[currentFloor] =
     roomId;
 
-  const room =
-    getCurrentRoom();
+  const room = getCurrentRoom();
 
   if(!room) return;
 
-  emptyState.classList.add(
-    "hidden"
-  );
+  emptyState.classList.add("hidden");
 
-  roomPanel.classList.remove(
-    "hidden"
-  );
+  roomPanel.classList.remove("hidden");
 
-  roomTitle.textContent =
-    room.id;
+  roomTitle.textContent = room.id;
 
   floorLabel.textContent =
     currentFloor
@@ -918,11 +1101,9 @@ function selectRoom(roomId){
 
 function renderRoomData(){
 
-  const room =
-    getCurrentRoom();
+  const room = getCurrentRoom();
 
-  paintContainer.innerHTML =
-    "";
+  paintContainer.innerHTML = "";
 
   if(!room) return;
 
@@ -980,9 +1161,7 @@ function renderRoomData(){
 
       `;
 
-      paintContainer.appendChild(
-        card
-      );
+      paintContainer.appendChild(card);
 
     });
 
@@ -1053,9 +1232,7 @@ function renderRoomData(){
 
         `;
 
-        paintContainer.appendChild(
-          card
-        );
+        paintContainer.appendChild(card);
 
       }
     );
@@ -1066,9 +1243,8 @@ function renderRoomData(){
 
 function deletePaint(index){
 
-  const confirmed = confirm(
-    "Delete this paint?"
-  );
+  const confirmed =
+    confirm("Delete this paint?");
 
   if(!confirmed) return;
 
@@ -1082,9 +1258,10 @@ function deletePaint(index){
 
 function deleteRoom(){
 
-  const confirmed = confirm(
-    `Delete room "${currentRoom}"?`
-  );
+  const confirmed =
+    confirm(
+      `Delete room "${currentRoom}"?`
+    );
 
   if(!confirmed) return;
 
@@ -1100,13 +1277,9 @@ function deleteRoom(){
 
   currentRoom = null;
 
-  roomPanel.classList.add(
-    "hidden"
-  );
+  roomPanel.classList.add("hidden");
 
-  emptyState.classList.remove(
-    "hidden"
-  );
+  emptyState.classList.remove("hidden");
 
   renderFloor();
 
@@ -1118,25 +1291,12 @@ function startDrawMode(){
 
   drawPoints = [];
 
-  drawBtn.classList.add(
-    "hidden"
-  );
+  drawBtn.classList.add("hidden");
+  undoBtn.classList.remove("hidden");
+  finishBtn.classList.remove("hidden");
+  cancelBtn.classList.remove("hidden");
 
-  undoBtn.classList.remove(
-    "hidden"
-  );
-
-  finishBtn.classList.remove(
-    "hidden"
-  );
-
-  cancelBtn.classList.remove(
-    "hidden"
-  );
-
-  drawStatus.classList.remove(
-    "hidden"
-  );
+  drawStatus.classList.remove("hidden");
 
   renderFloor();
 
@@ -1148,25 +1308,12 @@ function cancelDrawMode(){
 
   drawPoints = [];
 
-  drawBtn.classList.remove(
-    "hidden"
-  );
+  drawBtn.classList.remove("hidden");
+  undoBtn.classList.add("hidden");
+  finishBtn.classList.add("hidden");
+  cancelBtn.classList.add("hidden");
 
-  undoBtn.classList.add(
-    "hidden"
-  );
-
-  finishBtn.classList.add(
-    "hidden"
-  );
-
-  cancelBtn.classList.add(
-    "hidden"
-  );
-
-  drawStatus.classList.add(
-    "hidden"
-  );
+  drawStatus.classList.add("hidden");
 
   renderFloor();
 
@@ -1184,17 +1331,14 @@ function finishDrawMode(){
 
   if(drawPoints.length < 3){
 
-    alert(
-      "Need at least 3 points"
-    );
+    alert("Need at least 3 points");
 
     return;
 
   }
 
-  const roomName = prompt(
-    "Enter room name"
-  );
+  const roomName =
+    prompt("Enter room name");
 
   if(!roomName) return;
 
@@ -1209,9 +1353,7 @@ function finishDrawMode(){
 
   if(existingRoom){
 
-    alert(
-      "Room already exists"
-    );
+    alert("Room already exists");
 
     return;
 
@@ -1219,9 +1361,9 @@ function finishDrawMode(){
 
   const room = {
 
-    id: roomName,
+    id:roomName,
 
-    points: drawPoints
+    points:drawPoints
       .map(
         p => `${p[0]},${p[1]}`
       )
@@ -1239,31 +1381,7 @@ function finishDrawMode(){
 
   saveData();
 
-  drawMode = false;
-
-  drawPoints = [];
-
-  drawBtn.classList.remove(
-    "hidden"
-  );
-
-  undoBtn.classList.add(
-    "hidden"
-  );
-
-  finishBtn.classList.add(
-    "hidden"
-  );
-
-  cancelBtn.classList.add(
-    "hidden"
-  );
-
-  drawStatus.classList.add(
-    "hidden"
-  );
-
-  renderFloor();
+  cancelDrawMode();
 
 }
 
@@ -1278,29 +1396,16 @@ function renderDrawPreview(){
           "circle"
         );
 
-      circle.setAttribute(
-        "cx",
-        point[0]
-      );
-
-      circle.setAttribute(
-        "cy",
-        point[1]
-      );
-
-      circle.setAttribute(
-        "r",
-        5
-      );
+      circle.setAttribute("cx", point[0]);
+      circle.setAttribute("cy", point[1]);
+      circle.setAttribute("r", 5);
 
       circle.setAttribute(
         "class",
         "draw-point"
       );
 
-      overlay.appendChild(
-        circle
-      );
+      overlay.appendChild(circle);
 
       const text =
         document.createElementNS(
@@ -1323,12 +1428,9 @@ function renderDrawPreview(){
         "point-label"
       );
 
-      text.textContent =
-        index + 1;
+      text.textContent = index + 1;
 
-      overlay.appendChild(
-        text
-      );
+      overlay.appendChild(text);
 
     }
   );
@@ -1355,9 +1457,7 @@ function renderDrawPreview(){
       "temp-line"
     );
 
-    overlay.appendChild(
-      polyline
-    );
+    overlay.appendChild(polyline);
 
   }
 
@@ -1420,25 +1520,17 @@ function importData(event){
 
       renderFloor();
 
-      roomPanel.classList.add(
-        "hidden"
-      );
+      roomPanel.classList.add("hidden");
 
-      emptyState.classList.remove(
-        "hidden"
-      );
+      emptyState.classList.remove("hidden");
 
-      alert(
-        "Import successful"
-      );
+      alert("Import successful");
 
     }
 
     catch(error){
 
-      alert(
-        "Invalid file"
-      );
+      alert("Invalid file");
 
     }
 
@@ -1458,14 +1550,11 @@ overlay.addEventListener(
       overlay.createSVGPoint();
 
     pt.x = event.clientX;
-
     pt.y = event.clientY;
 
     const svgPoint =
       pt.matrixTransform(
-        overlay
-          .getScreenCTM()
-          .inverse()
+        overlay.getScreenCTM().inverse()
       );
 
     drawPoints.push([
@@ -1476,6 +1565,107 @@ overlay.addEventListener(
     renderFloor();
 
   }
+);
+
+mapViewport.addEventListener(
+  "mousedown",
+  (event)=>{
+
+    if(drawMode) return;
+
+    if(event.target.closest(".room")) return;
+
+    isDraggingMap = true;
+
+    dragStartX =
+      event.clientX - panX;
+
+    dragStartY =
+      event.clientY - panY;
+
+    mapViewport.classList.add(
+      "dragging"
+    );
+
+  }
+);
+
+document.addEventListener(
+  "mousemove",
+  (event)=>{
+
+    if(!isDraggingMap) return;
+
+    panX =
+      event.clientX - dragStartX;
+
+    panY =
+      event.clientY - dragStartY;
+
+    updateTransform();
+
+  }
+);
+
+document.addEventListener(
+  "mouseup",
+  ()=>{
+
+    isDraggingMap = false;
+
+    mapViewport.classList.remove(
+      "dragging"
+    );
+
+  }
+);
+
+mapViewport.addEventListener(
+  "wheel",
+  (event)=>{
+
+    event.preventDefault();
+
+    const delta =
+      event.deltaY;
+
+    if(delta < 0){
+
+      zoom *= 1.1;
+
+    }
+
+    else{
+
+      zoom /= 1.1;
+
+    }
+
+    zoom =
+      Math.max(
+        0.3,
+        Math.min(zoom, 8)
+      );
+
+    updateTransform();
+
+  },
+  { passive:false }
+);
+
+zoomInBtn.addEventListener(
+  "click",
+  zoomIn
+);
+
+zoomOutBtn.addEventListener(
+  "click",
+  zoomOut
+);
+
+resetViewBtn.addEventListener(
+  "click",
+  resetView
 );
 
 drawBtn.addEventListener(
@@ -1563,13 +1753,9 @@ editBtn.addEventListener(
 
     editMode = true;
 
-    editBtn.classList.add(
-      "hidden"
-    );
+    editBtn.classList.add("hidden");
 
-    saveBtn.classList.remove(
-      "hidden"
-    );
+    saveBtn.classList.remove("hidden");
 
     cancelEditBtn.classList.remove(
       "hidden"
@@ -1594,6 +1780,8 @@ editBtn.addEventListener(
     notesField.value =
       getCurrentRoom().notes;
 
+    renderFloor();
+
     renderRoomData();
 
   }
@@ -1605,13 +1793,9 @@ cancelEditBtn.addEventListener(
 
     editMode = false;
 
-    editBtn.classList.remove(
-      "hidden"
-    );
+    editBtn.classList.remove("hidden");
 
-    saveBtn.classList.add(
-      "hidden"
-    );
+    saveBtn.classList.add("hidden");
 
     cancelEditBtn.classList.add(
       "hidden"
@@ -1632,6 +1816,8 @@ cancelEditBtn.addEventListener(
     notesField.classList.add(
       "hidden"
     );
+
+    renderFloor();
 
     renderRoomData();
 
@@ -1670,13 +1856,9 @@ saveBtn.addEventListener(
 
     editMode = false;
 
-    editBtn.classList.remove(
-      "hidden"
-    );
+    editBtn.classList.remove("hidden");
 
-    saveBtn.classList.add(
-      "hidden"
-    );
+    saveBtn.classList.add("hidden");
 
     cancelEditBtn.classList.add(
       "hidden"
@@ -1697,6 +1879,8 @@ saveBtn.addEventListener(
     notesField.classList.add(
       "hidden"
     );
+
+    renderFloor();
 
     renderRoomData();
 
@@ -1797,8 +1981,9 @@ document.addEventListener(
 
 renderFloor();
 
+updateTransform();
+
 </script>
 
 </body>
-
 </html>
