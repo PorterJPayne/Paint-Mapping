@@ -1,86 +1,40 @@
 const MAP_WIDTH = 2000;
 const MAP_HEIGHT = 743;
 
-const overlay =
-  document.getElementById("overlay");
+const overlay = document.getElementById("overlay");
+const floorImage = document.getElementById("floorImage");
+const roomList = document.getElementById("roomList");
+const roomPanel = document.getElementById("roomPanel");
+const emptyState = document.getElementById("emptyState");
+const roomTitle = document.getElementById("roomTitle");
+const floorLabel = document.getElementById("floorLabel");
+const paintContainer = document.getElementById("paintContainer");
+const notesDisplay = document.getElementById("notesDisplay");
+const notesField = document.getElementById("notesField");
 
-const floorImage =
-  document.getElementById("floorImage");
+const floorSelect = document.getElementById("floorSelect");
 
-const roomList =
-  document.getElementById("roomList");
+const drawBtn = document.getElementById("drawBtn");
+const undoBtn = document.getElementById("undoBtn");
+const finishBtn = document.getElementById("finishBtn");
+const cancelBtn = document.getElementById("cancelBtn");
 
-const roomPanel =
-  document.getElementById("roomPanel");
+const editBtn = document.getElementById("editBtn");
+const saveBtn = document.getElementById("saveBtn");
+const cancelEditBtn = document.getElementById("cancelEditBtn");
+const addPaintBtn = document.getElementById("addPaintBtn");
 
-const emptyState =
-  document.getElementById("emptyState");
+const exportBtn = document.getElementById("exportBtn");
+const importBtn = document.getElementById("importBtn");
+const importFile = document.getElementById("importFile");
 
-const roomTitle =
-  document.getElementById("roomTitle");
+const mapViewport = document.getElementById("mapViewport");
+const mapTransform = document.getElementById("mapTransform");
 
-const floorLabel =
-  document.getElementById("floorLabel");
+const searchInput = document.getElementById("searchInput");
+const resetViewBtn = document.getElementById("resetViewBtn");
 
-const paintContainer =
-  document.getElementById("paintContainer");
-
-const notesDisplay =
-  document.getElementById("notesDisplay");
-
-const notesField =
-  document.getElementById("notesField");
-
-const floorSelect =
-  document.getElementById("floorSelect");
-
-const drawBtn =
-  document.getElementById("drawBtn");
-
-const undoBtn =
-  document.getElementById("undoBtn");
-
-const finishBtn =
-  document.getElementById("finishBtn");
-
-const cancelBtn =
-  document.getElementById("cancelBtn");
-
-const drawStatus =
-  document.getElementById("drawStatus");
-
-const editBtn =
-  document.getElementById("editBtn");
-
-const saveBtn =
-  document.getElementById("saveBtn");
-
-const cancelEditBtn =
-  document.getElementById("cancelEditBtn");
-
-const addPaintBtn =
-  document.getElementById("addPaintBtn");
-
-const exportBtn =
-  document.getElementById("exportBtn");
-
-const importBtn =
-  document.getElementById("importBtn");
-
-const importFile =
-  document.getElementById("importFile");
-
-const mapViewport =
-  document.getElementById("mapViewport");
-
-const mapTransform =
-  document.getElementById("mapTransform");
-
-const searchInput =
-  document.getElementById("searchInput");
-
-const resetViewBtn =
-  document.getElementById("resetViewBtn");
+const drawStatus = document.getElementById("drawStatus");
 
 let currentFloor = "1st-floor";
 let currentRoom = null;
@@ -138,8 +92,7 @@ function saveData(){
 
 function getFloor(){
 
-  return buildingData
-    .floors[currentFloor];
+  return buildingData.floors[currentFloor];
 
 }
 
@@ -189,7 +142,8 @@ function renderRoomList(){
     const div =
       document.createElement("div");
 
-    div.className = "room-item";
+    div.className =
+      "room-item";
 
     if(room.id === currentRoom){
 
@@ -270,17 +224,19 @@ function selectRoom(id){
   currentRoom = id;
 
   const room =
-    getFloor()
-      .rooms
-      .find(
-        r => r.id === id
-      );
+    getFloor().rooms.find(
+      r => r.id === id
+    );
 
   if(!room) return;
 
-  emptyState.classList.add("hidden");
+  emptyState.classList.add(
+    "hidden"
+  );
 
-  roomPanel.classList.remove("hidden");
+  roomPanel.classList.remove(
+    "hidden"
+  );
 
   roomTitle.textContent =
     room.id;
@@ -298,49 +254,113 @@ function renderSidebar(room){
 
   paintContainer.innerHTML = "";
 
-  room.paints.forEach(paint=>{
+  // VIEW MODE
 
-    const card =
-      document.createElement("div");
+  if(!editMode){
 
-    card.className = "paint-card";
+    room.paints.forEach(paint=>{
 
-    card.innerHTML = `
-      <div class="paint-surface">
-        ${paint.surface || ""}
-      </div>
+      const card =
+        document.createElement("div");
 
-      <div class="paint-name">
-        ${paint.color || ""}
-      </div>
+      card.className =
+        "paint-card";
 
-      <div class="paint-code">
-        ${paint.code || ""}
-      </div>
-
-      <div class="paint-meta">
-
-        <div>
-          <strong>Finish</strong>
-          <br>
-          ${paint.finish || ""}
+      card.innerHTML = `
+        <div class="paint-surface">
+          ${paint.surface || ""}
         </div>
 
-        <div>
-          <strong>Brand</strong>
-          <br>
-          ${paint.brand || ""}
+        <div class="paint-name">
+          ${paint.color || ""}
         </div>
 
-      </div>
-    `;
+        <div class="paint-code">
+          ${paint.code || ""}
+        </div>
 
-    paintContainer.appendChild(card);
+        <div class="paint-meta">
 
-  });
+          <div>
+            <strong>Finish</strong>
+            <br>
+            ${paint.finish || ""}
+          </div>
 
-  notesDisplay.textContent =
-    room.notes || "No notes";
+          <div>
+            <strong>Brand</strong>
+            <br>
+            ${paint.brand || ""}
+          </div>
+
+        </div>
+      `;
+
+      paintContainer.appendChild(card);
+
+    });
+
+    notesDisplay.textContent =
+      room.notes || "No notes";
+
+  }
+
+  // EDIT MODE
+
+  else{
+
+    room.paints.forEach((paint,index)=>{
+
+      const card =
+        document.createElement("div");
+
+      card.className =
+        "edit-card";
+
+      card.innerHTML = `
+
+        <input
+          placeholder="Surface"
+          data-field="surface"
+          data-index="${index}"
+          value="${paint.surface || ""}"
+        >
+
+        <input
+          placeholder="Color"
+          data-field="color"
+          data-index="${index}"
+          value="${paint.color || ""}"
+        >
+
+        <input
+          placeholder="Code"
+          data-field="code"
+          data-index="${index}"
+          value="${paint.code || ""}"
+        >
+
+        <input
+          placeholder="Finish"
+          data-field="finish"
+          data-index="${index}"
+          value="${paint.finish || ""}"
+        >
+
+        <input
+          placeholder="Brand"
+          data-field="brand"
+          data-index="${index}"
+          value="${paint.brand || ""}"
+        >
+
+      `;
+
+      paintContainer.appendChild(card);
+
+    });
+
+  }
 
 }
 
@@ -448,15 +468,25 @@ function startDraw(){
 
   drawPoints = [];
 
-  drawStatus.classList.remove("hidden");
+  drawStatus.classList.remove(
+    "hidden"
+  );
 
-  drawBtn.classList.add("hidden");
+  drawBtn.classList.add(
+    "hidden"
+  );
 
-  undoBtn.classList.remove("hidden");
+  undoBtn.classList.remove(
+    "hidden"
+  );
 
-  finishBtn.classList.remove("hidden");
+  finishBtn.classList.remove(
+    "hidden"
+  );
 
-  cancelBtn.classList.remove("hidden");
+  cancelBtn.classList.remove(
+    "hidden"
+  );
 
 }
 
@@ -466,15 +496,25 @@ function stopDraw(){
 
   drawPoints = [];
 
-  drawStatus.classList.add("hidden");
+  drawStatus.classList.add(
+    "hidden"
+  );
 
-  drawBtn.classList.remove("hidden");
+  drawBtn.classList.remove(
+    "hidden"
+  );
 
-  undoBtn.classList.add("hidden");
+  undoBtn.classList.add(
+    "hidden"
+  );
 
-  finishBtn.classList.add("hidden");
+  finishBtn.classList.add(
+    "hidden"
+  );
 
-  cancelBtn.classList.add("hidden");
+  cancelBtn.classList.add(
+    "hidden"
+  );
 
   renderFloor();
 
@@ -484,7 +524,9 @@ function finishDraw(){
 
   if(drawPoints.length < 3){
 
-    alert("Need at least 3 points");
+    alert(
+      "Need at least 3 points"
+    );
 
     return;
 
@@ -590,9 +632,13 @@ floorSelect.onchange = ()=>{
 
   currentRoom = null;
 
-  roomPanel.classList.add("hidden");
+  roomPanel.classList.add(
+    "hidden"
+  );
 
-  emptyState.classList.remove("hidden");
+  emptyState.classList.remove(
+    "hidden"
+  );
 
   renderFloor();
 
@@ -614,6 +660,161 @@ searchInput.oninput = ()=>{
     selectRoom(room.id);
 
   }
+
+};
+
+editBtn.onclick = ()=>{
+
+  editMode = true;
+
+  editBtn.classList.add(
+    "hidden"
+  );
+
+  saveBtn.classList.remove(
+    "hidden"
+  );
+
+  cancelEditBtn.classList.remove(
+    "hidden"
+  );
+
+  addPaintBtn.classList.remove(
+    "hidden"
+  );
+
+  notesDisplay.classList.add(
+    "hidden"
+  );
+
+  notesField.classList.remove(
+    "hidden"
+  );
+
+  const room =
+    getFloor().rooms.find(
+      r => r.id === currentRoom
+    );
+
+  if(!room) return;
+
+  notesField.value =
+    room.notes || "";
+
+  renderSidebar(room);
+
+};
+
+cancelEditBtn.onclick = ()=>{
+
+  editMode = false;
+
+  editBtn.classList.remove(
+    "hidden"
+  );
+
+  saveBtn.classList.add(
+    "hidden"
+  );
+
+  cancelEditBtn.classList.add(
+    "hidden"
+  );
+
+  addPaintBtn.classList.add(
+    "hidden"
+  );
+
+  notesDisplay.classList.remove(
+    "hidden"
+  );
+
+  notesField.classList.add(
+    "hidden"
+  );
+
+  selectRoom(currentRoom);
+
+};
+
+saveBtn.onclick = ()=>{
+
+  const room =
+    getFloor().rooms.find(
+      r => r.id === currentRoom
+    );
+
+  const inputs =
+    document.querySelectorAll(
+      ".edit-card input"
+    );
+
+  inputs.forEach(input=>{
+
+    const index =
+      input.dataset.index;
+
+    const field =
+      input.dataset.field;
+
+    room.paints[index][field] =
+      input.value;
+
+  });
+
+  room.notes =
+    notesField.value;
+
+  saveData();
+
+  editMode = false;
+
+  editBtn.classList.remove(
+    "hidden"
+  );
+
+  saveBtn.classList.add(
+    "hidden"
+  );
+
+  cancelEditBtn.classList.add(
+    "hidden"
+  );
+
+  addPaintBtn.classList.add(
+    "hidden"
+  );
+
+  notesDisplay.classList.remove(
+    "hidden"
+  );
+
+  notesField.classList.add(
+    "hidden"
+  );
+
+  selectRoom(currentRoom);
+
+};
+
+addPaintBtn.onclick = ()=>{
+
+  const room =
+    getFloor().rooms.find(
+      r => r.id === currentRoom
+    );
+
+  room.paints.push({
+
+    surface:"",
+    color:"",
+    code:"",
+    finish:"",
+    brand:""
+
+  });
+
+  renderSidebar(room);
 
 };
 
