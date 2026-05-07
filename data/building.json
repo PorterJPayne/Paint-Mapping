@@ -90,12 +90,12 @@
       "code": "SW6229",
       "kilnSpec": "KP017",
       "brand": "Sherwin Williams",
-      "finish": "",
-      "surface": "",
-      "hex": "#cccccc",
-      "quantity": "",
-      "lowStock": "",
-      "location": "",
+      "finish": "Eggshell",
+      "surface": "Walls",
+      "hex": "#466067",
+      "quantity": "7",
+      "lowStock": "0",
+      "location": "Lehi 1 Storage",
       "notes": ""
     }
   ],
