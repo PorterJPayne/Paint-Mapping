@@ -79,6 +79,9 @@ const mapTransform =
 const searchInput =
   document.getElementById("searchInput");
 
+const resetViewBtn =
+  document.getElementById("resetViewBtn");
+
 let currentFloor = "1st-floor";
 let currentRoom = null;
 
@@ -295,115 +298,55 @@ function renderSidebar(room){
 
   paintContainer.innerHTML = "";
 
-  if(!editMode){
+  room.paints.forEach(paint=>{
 
-    room.paints.forEach(paint=>{
+    const card =
+      document.createElement("div");
 
-      const card =
-        document.createElement("div");
+    card.className = "paint-card";
 
-      card.className = "paint-card";
+    card.innerHTML = `
+      <div class="paint-surface">
+        ${paint.surface || ""}
+      </div>
 
-      card.innerHTML = `
-        <div class="paint-surface">
-          ${paint.surface || ""}
+      <div class="paint-name">
+        ${paint.color || ""}
+      </div>
+
+      <div class="paint-code">
+        ${paint.code || ""}
+      </div>
+
+      <div class="paint-meta">
+
+        <div>
+          <strong>Finish</strong>
+          <br>
+          ${paint.finish || ""}
         </div>
 
-        <div class="paint-name">
-          ${paint.color || ""}
+        <div>
+          <strong>Brand</strong>
+          <br>
+          ${paint.brand || ""}
         </div>
 
-        <div class="paint-code">
-          ${paint.code || ""}
-        </div>
+      </div>
+    `;
 
-        <div class="paint-meta">
+    paintContainer.appendChild(card);
 
-          <div>
-            <strong>Finish</strong>
-            <br>
-            ${paint.finish || ""}
-          </div>
+  });
 
-          <div>
-            <strong>Brand</strong>
-            <br>
-            ${paint.brand || ""}
-          </div>
-
-        </div>
-      `;
-
-      paintContainer.appendChild(card);
-
-    });
-
-    notesDisplay.textContent =
-      room.notes || "No notes";
-
-  }
-
-  else{
-
-    room.paints.forEach((paint,index)=>{
-
-      const card =
-        document.createElement("div");
-
-      card.className = "edit-card";
-
-      card.innerHTML = `
-
-        <input
-          placeholder="Surface"
-          data-field="surface"
-          data-index="${index}"
-          value="${paint.surface || ""}"
-        >
-
-        <input
-          placeholder="Color"
-          data-field="color"
-          data-index="${index}"
-          value="${paint.color || ""}"
-        >
-
-        <input
-          placeholder="Code"
-          data-field="code"
-          data-index="${index}"
-          value="${paint.code || ""}"
-        >
-
-        <input
-          placeholder="Finish"
-          data-field="finish"
-          data-index="${index}"
-          value="${paint.finish || ""}"
-        >
-
-        <input
-          placeholder="Brand"
-          data-field="brand"
-          data-index="${index}"
-          value="${paint.brand || ""}"
-        >
-
-      `;
-
-      paintContainer.appendChild(card);
-
-    });
-
-  }
+  notesDisplay.textContent =
+    room.notes || "No notes";
 
 }
 
 function renderDrawPreview(){
 
   drawPoints.forEach((point,index)=>{
-
-    // POINT
 
     const circle =
       document.createElementNS(
@@ -432,8 +375,6 @@ function renderDrawPreview(){
     );
 
     overlay.appendChild(circle);
-
-    // NUMBER LABEL
 
     const label =
       document.createElementNS(
@@ -472,8 +413,6 @@ function renderDrawPreview(){
     overlay.appendChild(label);
 
   });
-
-  // DRAW TEMP LINE
 
   if(drawPoints.length > 1){
 
@@ -584,22 +523,20 @@ overlay.addEventListener(
 
     if(!drawMode) return;
 
-    const pt =
-      overlay.createSVGPoint();
+    const rect =
+      overlay.getBoundingClientRect();
 
-    pt.x = event.clientX;
+    const x =
+      ((event.clientX - rect.left)
+      / rect.width)
+      * MAP_WIDTH;
 
-    pt.y = event.clientY;
+    const y =
+      ((event.clientY - rect.top)
+      / rect.height)
+      * MAP_HEIGHT;
 
-    const svgPoint =
-      pt.matrixTransform(
-        overlay.getScreenCTM().inverse()
-      );
-
-    drawPoints.push([
-      svgPoint.x,
-      svgPoint.y
-    ]);
+    drawPoints.push([x,y]);
 
     renderFloor();
 
@@ -653,6 +590,10 @@ floorSelect.onchange = ()=>{
 
   currentRoom = null;
 
+  roomPanel.classList.add("hidden");
+
+  emptyState.classList.remove("hidden");
+
   renderFloor();
 
 };
@@ -673,123 +614,6 @@ searchInput.oninput = ()=>{
     selectRoom(room.id);
 
   }
-
-};
-
-editBtn.onclick = ()=>{
-
-  editMode = true;
-
-  editBtn.classList.add("hidden");
-
-  saveBtn.classList.remove("hidden");
-
-  cancelEditBtn.classList.remove("hidden");
-
-  addPaintBtn.classList.remove("hidden");
-
-  notesDisplay.classList.add("hidden");
-
-  notesField.classList.remove("hidden");
-
-  const room =
-    getFloor().rooms.find(
-      r => r.id === currentRoom
-    );
-
-  notesField.value =
-    room.notes;
-
-  renderSidebar(room);
-
-};
-
-cancelEditBtn.onclick = ()=>{
-
-  editMode = false;
-
-  editBtn.classList.remove("hidden");
-
-  saveBtn.classList.add("hidden");
-
-  cancelEditBtn.classList.add("hidden");
-
-  addPaintBtn.classList.add("hidden");
-
-  notesDisplay.classList.remove("hidden");
-
-  notesField.classList.add("hidden");
-
-  selectRoom(currentRoom);
-
-};
-
-saveBtn.onclick = ()=>{
-
-  const room =
-    getFloor().rooms.find(
-      r => r.id === currentRoom
-    );
-
-  const inputs =
-    document.querySelectorAll(
-      ".edit-card input"
-    );
-
-  inputs.forEach(input=>{
-
-    const index =
-      input.dataset.index;
-
-    const field =
-      input.dataset.field;
-
-    room.paints[index][field] =
-      input.value;
-
-  });
-
-  room.notes =
-    notesField.value;
-
-  saveData();
-
-  editMode = false;
-
-  editBtn.classList.remove("hidden");
-
-  saveBtn.classList.add("hidden");
-
-  cancelEditBtn.classList.add("hidden");
-
-  addPaintBtn.classList.add("hidden");
-
-  notesDisplay.classList.remove("hidden");
-
-  notesField.classList.add("hidden");
-
-  selectRoom(currentRoom);
-
-};
-
-addPaintBtn.onclick = ()=>{
-
-  const room =
-    getFloor().rooms.find(
-      r => r.id === currentRoom
-    );
-
-  room.paints.push({
-
-    surface:"",
-    color:"",
-    code:"",
-    finish:"",
-    brand:""
-
-  });
-
-  renderSidebar(room);
 
 };
 
@@ -935,9 +759,7 @@ document.addEventListener(
   }
 );
 
-document.getElementById(
-  "resetViewBtn"
-).onclick = ()=>{
+resetViewBtn.onclick = ()=>{
 
   centerMap();
 
