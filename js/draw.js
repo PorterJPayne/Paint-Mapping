@@ -8,10 +8,20 @@ function renderDrawPreview(){
         "circle"
       );
 
-    circle.setAttribute("cx",point[0]);
-    circle.setAttribute("cy",point[1]);
+    circle.setAttribute(
+      "cx",
+      point[0]
+    );
 
-    circle.setAttribute("r",6);
+    circle.setAttribute(
+      "cy",
+      point[1]
+    );
+
+    circle.setAttribute(
+      "r",
+      6
+    );
 
     circle.setAttribute(
       "class",
@@ -96,6 +106,22 @@ function startDraw(){
     "hidden"
   );
 
+  drawBtn.classList.add(
+    "hidden"
+  );
+
+  undoBtn.classList.remove(
+    "hidden"
+  );
+
+  finishBtn.classList.remove(
+    "hidden"
+  );
+
+  cancelBtn.classList.remove(
+    "hidden"
+  );
+
 }
 
 function stopDraw(){
@@ -108,6 +134,22 @@ function stopDraw(){
     "hidden"
   );
 
+  drawBtn.classList.remove(
+    "hidden"
+  );
+
+  undoBtn.classList.add(
+    "hidden"
+  );
+
+  finishBtn.classList.add(
+    "hidden"
+  );
+
+  cancelBtn.classList.add(
+    "hidden"
+  );
+
   renderFloor();
 
 }
@@ -116,7 +158,9 @@ function finishDraw(){
 
   if(drawPoints.length < 3){
 
-    alert("Need at least 3 points");
+    alert(
+      "Need at least 3 points"
+    );
 
     return;
 
@@ -131,12 +175,11 @@ function finishDraw(){
 
     id:roomName,
 
-    points:
-      drawPoints
-        .map(
-          p => `${p[0]},${p[1]}`
-        )
-        .join(" "),
+    points:drawPoints
+      .map(
+        p => `${p[0]},${p[1]}`
+      )
+      .join(" "),
 
     paints:[],
 
