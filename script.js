@@ -86,6 +86,23 @@ let buildingData =
     localStorage.getItem("paintMapData")
   ) || defaultData;
 
+// DATA MIGRATION
+
+if(!buildingData.inventory){
+
+  buildingData.inventory = [];
+
+}
+
+if(!buildingData.floors){
+
+  buildingData.floors =
+    defaultData.floors;
+
+}
+
+saveData();
+
 function saveData(){
 
   localStorage.setItem(
