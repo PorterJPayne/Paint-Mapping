@@ -4,6 +4,14 @@ const MAP_HEIGHT = 743;
 let currentFloor = "1st-floor";
 let currentRoom = null;
 
+const lastSelectedRooms = {
+
+  "1st-floor":null,
+  "2nd-floor":null,
+  "5th-floor":null
+
+};
+
 let drawMode = false;
 let editMode = false;
 
@@ -42,6 +50,7 @@ const defaultData = {
   }
 
 };
+
 let buildingData =
   JSON.parse(
     localStorage.getItem("paintMapData")
