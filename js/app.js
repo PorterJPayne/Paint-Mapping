@@ -268,18 +268,11 @@ resetViewBtn.onclick = ()=>{
 
 // STARTUP
 
+// STARTUP
+
 window.addEventListener(
   "load",
-  async ()=>{
-
-    await loadCloudData();
-
-    centerMap();
-
-    renderFloor();
-
-  }
-);
+  ()=>{
 
     centerMap();
 
