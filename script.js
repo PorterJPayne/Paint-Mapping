@@ -836,3 +836,177 @@ window.addEventListener(
 
   }
 );
+// RESTORE MAP BUTTONS
+
+drawBtn.onclick =
+  startDraw;
+
+cancelBtn.onclick =
+  stopDraw;
+
+undoBtn.onclick = ()=>{
+
+  drawPoints.pop();
+
+  renderFloor();
+
+};
+
+finishBtn.onclick =
+  finishDraw;
+
+// FLOOR SWITCHING
+
+floorSelect.onchange = ()=>{
+
+  currentFloor =
+    floorSelect.value;
+
+  currentRoom = null;
+
+  renderFloor();
+
+};
+
+// MAP CLICK DRAWING
+
+overlay.addEventListener(
+  "click",
+  (event)=>{
+
+    if(!drawMode) return;
+
+    const rect =
+      overlay.getBoundingClientRect();
+
+    const x =
+      ((event.clientX - rect.left)
+      / rect.width)
+      * MAP_WIDTH;
+
+    const y =
+      ((event.clientY - rect.top)
+      / rect.height)
+      * MAP_HEIGHT;
+
+    drawPoints.push([x,y]);
+
+    renderFloor();
+
+  }
+);
+
+// ZOOM
+
+mapViewport.addEventListener(
+  "wheel",
+  (event)=>{
+
+    event.preventDefault();
+
+    const factor =
+      event.deltaY < 0
+      ? 1.02
+      : 0.98;
+
+    const oldZoom =
+      zoom;
+
+    zoom *= factor;
+
+    zoom =
+      Math.max(
+        0.2,
+        Math.min(zoom,5)
+      );
+
+    const rect =
+      mapViewport.getBoundingClientRect();
+
+    const mouseX =
+      event.clientX - rect.left;
+
+    const mouseY =
+      event.clientY - rect.top;
+
+    panX =
+      mouseX -
+      ((mouseX - panX)
+      * (zoom / oldZoom));
+
+    panY =
+      mouseY -
+      ((mouseY - panY)
+      * (zoom / oldZoom));
+
+    updateTransform();
+
+  },
+  { passive:false }
+);
+
+// PAN
+
+mapViewport.addEventListener(
+  "mousedown",
+  (e)=>{
+
+    draggingMap = true;
+
+    dragStartX =
+      e.clientX - panX;
+
+    dragStartY =
+      e.clientY - panY;
+
+  }
+);
+
+document.addEventListener(
+  "mousemove",
+  (e)=>{
+
+    if(!draggingMap) return;
+
+    panX =
+      e.clientX - dragStartX;
+
+    panY =
+      e.clientY - dragStartY;
+
+    updateTransform();
+
+  }
+);
+
+document.addEventListener(
+  "mouseup",
+  ()=>{
+
+    draggingMap = false;
+
+  }
+);
+
+// RESET VIEW
+
+resetViewBtn.onclick = ()=>{
+
+  centerMap();
+
+};
+
+// INITIALIZE
+
+window.addEventListener(
+  "load",
+  ()=>{
+
+    ensureInventoryButton();
+
+    centerMap();
+
+    renderFloor();
+
+  }
+);
