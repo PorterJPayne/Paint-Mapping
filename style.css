@@ -5,8 +5,8 @@
 body{
   margin:0;
   font-family:Arial,sans-serif;
-  background:#f3f3f3;
   overflow:hidden;
+  background:#eee;
 }
 
 .hidden{
@@ -16,11 +16,11 @@ body{
 .topbar{
   height:70px;
   background:white;
-  border-bottom:1px solid #ddd;
+  border-bottom:1px solid #ccc;
   display:flex;
-  align-items:center;
   justify-content:space-between;
-  padding:0 20px;
+  align-items:center;
+  padding:0 16px;
 }
 
 .topbar-left,
@@ -36,69 +36,59 @@ body{
 }
 
 .room-list{
-  width:170px;
-  min-width:170px;
+  width:160px;
   background:white;
-  border-right:1px solid #ddd;
+  border-right:1px solid #ccc;
   overflow-y:auto;
-  padding:12px;
+  padding:10px;
 }
 
-.room-list-item{
-  padding:7px 8px;
+.room-item{
+  padding:8px;
   border-radius:6px;
   cursor:pointer;
-  margin-bottom:4px;
   font-size:13px;
 }
 
-.room-list-item:hover{
+.room-item:hover{
   background:#eee;
 }
 
-.room-list-item.active{
+.room-item.active{
   background:#dcecff;
 }
 
-.layout-main{
-  flex:1;
-  display:flex;
-}
-
 .map-section{
-  flex:7;
-  position:relative;
+  flex:1;
   overflow:hidden;
-  background:#ddd;
+  position:relative;
+  background:#d8d8d8;
 }
 
 .sidebar{
-  flex:3;
+  width:360px;
   background:white;
-  border-left:1px solid #ddd;
-  padding:20px;
+  border-left:1px solid #ccc;
   overflow-y:auto;
+  padding:18px;
 }
 
 .map-viewport{
   width:100%;
   height:100%;
   overflow:hidden;
-  cursor:grab;
   position:relative;
 }
 
 .map-transform{
   transform-origin:0 0;
   position:absolute;
-  left:0;
-  top:0;
 }
 
 .map-container{
-  position:relative;
   width:2000px;
   height:743px;
+  position:relative;
 }
 
 #floorImage{
@@ -116,115 +106,114 @@ body{
 
 .room{
   fill:rgba(0,150,255,0.08);
-  stroke:rgba(0,150,255,0.5);
+  stroke:rgba(0,150,255,0.7);
   stroke-width:2;
   cursor:pointer;
 }
 
 .room.active{
-  fill:rgba(0,150,255,0.35);
+  fill:rgba(0,150,255,0.3);
+}
+
+.draw-point{
+  fill:red;
+}
+
+.temp-line{
+  stroke:red;
+  stroke-width:2;
+  fill:rgba(255,0,0,0.12);
 }
 
 .vertex{
-  fill:#ff9800;
+  fill:orange;
   stroke:white;
   stroke-width:2;
   cursor:move;
 }
 
 button{
-  padding:10px 14px;
   border:none;
-  border-radius:6px;
   background:#222;
   color:white;
+  padding:10px 12px;
+  border-radius:6px;
   cursor:pointer;
 }
 
-.secondary{
-  background:#777;
+.danger{
+  background:#a91c1c;
 }
 
-.small-danger{
-  background:#b42318;
-  padding:6px 10px;
-  font-size:12px;
-}
-
-.search-input{
-  width:220px;
-  padding:10px;
-}
-
-.room-title{
-  font-size:32px;
-  margin:0;
-}
-
-.paint-display-card{
-  border:1px solid #ddd;
-  border-radius:12px;
-  padding:18px;
+.sidebar-buttons{
+  display:flex;
+  gap:10px;
   margin-bottom:16px;
+  flex-wrap:wrap;
+}
+
+.paint-card{
+  border:1px solid #ddd;
+  border-radius:10px;
+  padding:14px;
+  margin-bottom:14px;
   background:#fafafa;
 }
 
 .paint-surface{
   font-size:12px;
   color:#666;
-  margin-bottom:8px;
+  margin-bottom:6px;
   text-transform:uppercase;
 }
 
 .paint-name{
-  font-size:26px;
+  font-size:24px;
   font-weight:bold;
-  margin-bottom:6px;
 }
 
 .paint-code{
-  font-size:18px;
-  margin-bottom:14px;
+  margin-top:4px;
+  margin-bottom:12px;
 }
 
-.paint-meta-row{
+.paint-meta{
   display:flex;
-  gap:20px;
+  gap:30px;
 }
 
-.notes-text{
+.notes-box{
   border:1px solid #ddd;
-  border-radius:10px;
-  padding:14px;
+  padding:12px;
+  border-radius:8px;
   background:#fafafa;
 }
 
 .edit-card{
   border:1px solid #ddd;
-  border-radius:10px;
-  padding:16px;
-  margin-bottom:16px;
-}
-
-.edit-card input,
-textarea{
-  width:100%;
-  padding:10px;
+  padding:12px;
+  border-radius:8px;
   margin-bottom:12px;
 }
 
-.zoom-controls{
-  position:absolute;
-  right:14px;
-  bottom:14px;
-  display:flex;
-  flex-direction:column;
-  gap:8px;
+.edit-card input{
+  width:100%;
+  margin-bottom:10px;
+  padding:10px;
 }
 
-.zoom-controls button{
-  width:42px;
-  height:42px;
-  font-size:20px;
-  padding:0;
+textarea{
+  width:100%;
+  padding:10px;
+}
+
+.draw-status{
+  position:absolute;
+  top:10px;
+  left:10px;
+  background:rgba(0,0,0,0.8);
+  color:white;
+  padding:12px;
+  border-radius:8px;
+  z-index:100;
 }
