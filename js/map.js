@@ -17,9 +17,20 @@ function renderVertices(room){
         "circle"
       );
 
-    vertex.setAttribute("cx",point[0]);
-    vertex.setAttribute("cy",point[1]);
-    vertex.setAttribute("r",7);
+    vertex.setAttribute(
+      "cx",
+      point[0]
+    );
+
+    vertex.setAttribute(
+      "cy",
+      point[1]
+    );
+
+    vertex.setAttribute(
+      "r",
+      7
+    );
 
     vertex.setAttribute(
       "class",
@@ -73,7 +84,9 @@ function renderFloor(){
 
     if(room.id === currentRoom){
 
-      polygon.classList.add("active");
+      polygon.classList.add(
+        "active"
+      );
 
     }
 
@@ -85,7 +98,9 @@ function renderFloor(){
 
     };
 
-    overlay.appendChild(polygon);
+    overlay.appendChild(
+      polygon
+    );
 
     if(room.id === currentRoom){
 
