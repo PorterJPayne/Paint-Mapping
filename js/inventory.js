@@ -231,7 +231,9 @@ function deleteInventoryPaint(index){
 
 }
 
-inventoryBtn.onclick =
+document.getElementById(
+  "inventoryBtn"
+).onclick =
   openInventory;
 
 closeInventoryBtn.onclick =
