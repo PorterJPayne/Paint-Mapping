@@ -1,0 +1,24 @@
+{
+  "inventory": [],
+  "floors": {
+    "1st-floor": {
+      "image": "images/1st-floor.png",
+      "rooms": [
+        {
+          "id": "PS 14",
+          "points": "1784.4875346260387,65.68281727933999 1784.4875346260387,273.9930491429643 1937.3961218836566,280.6412480322289 1935.180055401662,61.25068468649692",
+          "paints": [],
+          "notes": ""
+        }
+      ]
+    },
+    "2nd-floor": {
+      "image": "images/2nd-floor.png",
+      "rooms": []
+    },
+    "5th-floor": {
+      "image": "images/5th-floor.png",
+      "rooms": []
+    }
+  }
+}
