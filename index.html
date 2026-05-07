@@ -1,8 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
 
 <title>Paint Map Manager</title>
 
@@ -26,6 +32,18 @@ body{
   align-items:center;
   justify-content:space-between;
   padding:0 20px;
+}
+
+.topbar-left{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.topbar-right{
+  display:flex;
+  align-items:center;
+  gap:10px;
 }
 
 .layout{
@@ -55,6 +73,8 @@ body{
 #floorImage{
   width:100%;
   display:block;
+  user-select:none;
+  -webkit-user-drag:none;
 }
 
 #overlay{
@@ -66,10 +86,11 @@ body{
 
 .room{
   fill:rgba(0,150,255,0.08);
-  stroke:rgba(0,150,255,0.4);
+  stroke:rgba(0,150,255,0.5);
   stroke-width:2;
   vector-effect:non-scaling-stroke;
   cursor:pointer;
+  transition:0.15s;
 }
 
 .room:hover{
@@ -89,6 +110,14 @@ body{
 .temp-line{
   stroke:red;
   stroke-width:2;
+  fill:rgba(255,0,0,0.12);
+}
+
+.point-label{
+  fill:red;
+  font-size:18px;
+  font-weight:bold;
+  user-select:none;
 }
 
 button{
@@ -98,11 +127,18 @@ button{
   color:white;
   border-radius:6px;
   cursor:pointer;
-  margin-right:8px;
 }
 
 button:hover{
   opacity:0.9;
+}
+
+button.secondary{
+  background:#777;
+}
+
+button.danger{
+  background:#b42318;
 }
 
 .paint-card{
@@ -110,6 +146,7 @@ button:hover{
   border-radius:8px;
   padding:14px;
   margin-bottom:16px;
+  background:#fafafa;
 }
 
 .paint-card input,
@@ -124,25 +161,78 @@ textarea{
   display:none;
 }
 
+.room-title{
+  margin-top:0;
+}
+
+.draw-status{
+  position:absolute;
+  top:12px;
+  left:12px;
+  background:rgba(0,0,0,0.75);
+  color:white;
+  padding:10px 14px;
+  border-radius:8px;
+  font-size:14px;
+  z-index:10;
+}
+
+.instructions{
+  font-size:14px;
+  color:#666;
+  line-height:1.5;
+}
+
 </style>
+
 </head>
 
 <body>
 
 <header class="topbar">
 
-  <h2>Paint Map Manager</h2>
+  <div class="topbar-left">
 
-  <div>
+    <h2>
+      Paint Map Manager
+    </h2>
 
-    <button id="drawBtn">Draw Room</button>
-    <button id="finishBtn" class="hidden">Finish Room</button>
-    <button id="cancelBtn" class="hidden">Cancel</button>
+  </div>
+
+  <div class="topbar-right">
+
+    <button id="drawBtn">
+      Draw Room
+    </button>
+
+    <button
+      id="finishBtn"
+      class="hidden"
+    >
+      Finish Room
+    </button>
+
+    <button
+      id="cancelBtn"
+      class="hidden secondary"
+    >
+      Cancel
+    </button>
 
     <select id="floorSelect">
-      <option value="1st-floor">1st Floor</option>
-      <option value="2nd-floor">2nd Floor</option>
-      <option value="5th-floor">5th Floor</option>
+
+      <option value="1st-floor">
+        1st Floor
+      </option>
+
+      <option value="2nd-floor">
+        2nd Floor
+      </option>
+
+      <option value="5th-floor">
+        5th Floor
+      </option>
+
     </select>
 
   </div>
@@ -154,6 +244,23 @@ textarea{
   <section class="map-section">
 
     <div class="map-container">
+
+      <div
+        id="drawStatus"
+        class="draw-status hidden"
+      >
+
+        Drawing Room...
+
+        <br>
+
+        ENTER = Finish
+
+        <br>
+
+        ESC = Cancel
+
+      </div>
 
       <img
         id="floorImage"
@@ -173,27 +280,62 @@ textarea{
   <aside class="sidebar">
 
     <div id="emptyState">
-      <h2>Select a room</h2>
+
+      <h2>
+        Select a room
+      </h2>
+
+      <div class="instructions">
+
+        Click a room polygon
+        to view paint info.
+
+        <br><br>
+
+        Use Draw Room to
+        create new rooms.
+
+      </div>
+
     </div>
 
-    <div id="roomPanel" class="hidden">
+    <div
+      id="roomPanel"
+      class="hidden"
+    >
 
-      <h2 id="roomTitle"></h2>
+      <h2
+        id="roomTitle"
+        class="room-title"
+      ></h2>
 
-      <button id="editBtn">Edit</button>
-      <button id="saveBtn" class="hidden">Save</button>
+      <button id="editBtn">
+        Edit
+      </button>
+
+      <button
+        id="saveBtn"
+        class="hidden"
+      >
+        Save
+      </button>
 
       <br><br>
 
       <div id="paintContainer"></div>
 
-      <button id="addPaintBtn" class="hidden">
+      <button
+        id="addPaintBtn"
+        class="hidden"
+      >
         + Add Paint
       </button>
 
       <br><br>
 
-      <label>Notes</label>
+      <label>
+        Notes
+      </label>
 
       <textarea
         id="notesField"
@@ -209,30 +351,62 @@ textarea{
 
 <script>
 
-const floorImage = document.getElementById("floorImage");
-const floorSelect = document.getElementById("floorSelect");
-const overlay = document.getElementById("overlay");
+const SVG_WIDTH = 2000;
+const SVG_HEIGHT = 743;
 
-const drawBtn = document.getElementById("drawBtn");
-const finishBtn = document.getElementById("finishBtn");
-const cancelBtn = document.getElementById("cancelBtn");
+const floorImage =
+  document.getElementById("floorImage");
 
-const roomPanel = document.getElementById("roomPanel");
-const emptyState = document.getElementById("emptyState");
+const floorSelect =
+  document.getElementById("floorSelect");
 
-const roomTitle = document.getElementById("roomTitle");
-const paintContainer = document.getElementById("paintContainer");
-const notesField = document.getElementById("notesField");
+const overlay =
+  document.getElementById("overlay");
 
-const editBtn = document.getElementById("editBtn");
-const saveBtn = document.getElementById("saveBtn");
-const addPaintBtn = document.getElementById("addPaintBtn");
+const drawBtn =
+  document.getElementById("drawBtn");
+
+const finishBtn =
+  document.getElementById("finishBtn");
+
+const cancelBtn =
+  document.getElementById("cancelBtn");
+
+const drawStatus =
+  document.getElementById("drawStatus");
+
+const roomPanel =
+  document.getElementById("roomPanel");
+
+const emptyState =
+  document.getElementById("emptyState");
+
+const roomTitle =
+  document.getElementById("roomTitle");
+
+const paintContainer =
+  document.getElementById("paintContainer");
+
+const notesField =
+  document.getElementById("notesField");
+
+const editBtn =
+  document.getElementById("editBtn");
+
+const saveBtn =
+  document.getElementById("saveBtn");
+
+const addPaintBtn =
+  document.getElementById("addPaintBtn");
 
 let currentFloor = "1st-floor";
+
 let currentRoom = null;
+
 let editMode = false;
 
 let drawMode = false;
+
 let drawPoints = [];
 
 const defaultBuildingData = {
@@ -240,18 +414,27 @@ const defaultBuildingData = {
   floors: {
 
     "1st-floor": {
-      image: "1st-floor.png",
-      rooms: []
+
+      image:"1st-floor.png",
+
+      rooms:[]
+
     },
 
     "2nd-floor": {
-      image: "2nd-floor.png",
-      rooms: []
+
+      image:"2nd-floor.png",
+
+      rooms:[]
+
     },
 
     "5th-floor": {
-      image: "5th-floor.png",
-      rooms: []
+
+      image:"5th-floor.png",
+
+      rooms:[]
+
     }
 
   }
@@ -260,18 +443,26 @@ const defaultBuildingData = {
 
 function loadData(){
 
-  const saved = localStorage.getItem("buildingData");
+  const saved =
+    localStorage.getItem(
+      "buildingData"
+    );
 
   if(saved){
+
     return JSON.parse(saved);
+
   }
 
   localStorage.setItem(
     "buildingData",
-    JSON.stringify(defaultBuildingData)
+    JSON.stringify(
+      defaultBuildingData
+    )
   );
 
   return defaultBuildingData;
+
 }
 
 let buildingData = loadData();
@@ -285,40 +476,87 @@ function saveData(){
 
 }
 
+function getCurrentFloorData(){
+
+  return buildingData
+    .floors[currentFloor];
+
+}
+
+function getCurrentRoom(){
+
+  return getCurrentFloorData()
+    .rooms
+    .find(
+      room => room.id === currentRoom
+    );
+
+}
+
 function renderFloor(){
 
   overlay.innerHTML = "";
 
-  const floor = buildingData.floors[currentFloor];
+  const floor =
+    getCurrentFloorData();
 
   floorImage.src = floor.image;
 
-  floor.rooms.forEach(room=>{
+  floor.rooms.forEach(room => {
 
-    const polygon = document.createElementNS(
-      "http://www.w3.org/2000/svg",
-      "polygon"
+    const polygon =
+      document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "polygon"
+      );
+
+    polygon.setAttribute(
+      "points",
+      room.points
     );
 
-    polygon.setAttribute("points", room.points);
-    polygon.setAttribute("class", "room");
-    polygon.setAttribute("data-room-id", room.id);
+    polygon.setAttribute(
+      "class",
+      "room"
+    );
 
-    polygon.addEventListener("click", ()=>{
+    polygon.dataset.roomId =
+      room.id;
 
-      selectRoom(room.id);
+    polygon.addEventListener(
+      "click",
+      (event)=>{
 
-      document.querySelectorAll(".room").forEach(r=>{
-        r.classList.remove("active");
-      });
+        if(drawMode) return;
 
-      polygon.classList.add("active");
+        event.stopPropagation();
 
-    });
+        selectRoom(room.id);
 
-    overlay.appendChild(polygon);
+        document
+          .querySelectorAll(".room")
+          .forEach(r => {
+            r.classList.remove("active");
+          });
+
+        polygon.classList.add(
+          "active"
+        );
+
+      }
+    );
+
+    overlay.appendChild(
+      polygon
+    );
 
   });
+
+  if(drawMode){
+
+    renderDrawPreview();
+
+  }
 
 }
 
@@ -326,181 +564,165 @@ function selectRoom(roomId){
 
   currentRoom = roomId;
 
-  const room = getCurrentRoom();
+  const room =
+    getCurrentRoom();
 
-  emptyState.classList.add("hidden");
-  roomPanel.classList.remove("hidden");
+  if(!room) return;
 
-  roomTitle.textContent = room.id;
+  emptyState.classList.add(
+    "hidden"
+  );
+
+  roomPanel.classList.remove(
+    "hidden"
+  );
+
+  roomTitle.textContent =
+    room.id;
 
   renderRoomData();
 
 }
 
-function getCurrentRoom(){
-
-  return buildingData
-    .floors[currentFloor]
-    .rooms
-    .find(room=>room.id === currentRoom);
-
-}
-
 function renderRoomData(){
 
-  const room = getCurrentRoom();
+  const room =
+    getCurrentRoom();
 
-  paintContainer.innerHTML = "";
+  paintContainer.innerHTML =
+    "";
 
-  room.paints.forEach((paint,index)=>{
+  room.paints.forEach(
+    (paint,index)=>{
 
-    const card = document.createElement("div");
+      const card =
+        document.createElement("div");
 
-    card.className = "paint-card";
+      card.className =
+        "paint-card";
 
-    card.innerHTML = `
+      card.innerHTML = `
 
-      <label>Location</label>
-      <input
-        data-field="location"
-        data-index="${index}"
-        value="${paint.location}"
-        ${!editMode ? "disabled" : ""}
-      >
+        <label>Location</label>
 
-      <label>Color</label>
-      <input
-        data-field="color"
-        data-index="${index}"
-        value="${paint.color}"
-        ${!editMode ? "disabled" : ""}
-      >
+        <input
+          data-field="location"
+          data-index="${index}"
+          value="${paint.location}"
+          ${!editMode ? "disabled" : ""}
+        >
 
-      <label>Brand</label>
-      <input
-        data-field="brand"
-        data-index="${index}"
-        value="${paint.brand}"
-        ${!editMode ? "disabled" : ""}
-      >
+        <label>Color</label>
 
-      <label>Finish</label>
-      <input
-        data-field="finish"
-        data-index="${index}"
-        value="${paint.finish}"
-        ${!editMode ? "disabled" : ""}
-      >
+        <input
+          data-field="color"
+          data-index="${index}"
+          value="${paint.color}"
+          ${!editMode ? "disabled" : ""}
+        >
 
-    `;
+        <label>Brand</label>
 
-    paintContainer.appendChild(card);
+        <input
+          data-field="brand"
+          data-index="${index}"
+          value="${paint.brand}"
+          ${!editMode ? "disabled" : ""}
+        >
 
-  });
+        <label>Finish</label>
 
-  notesField.value = room.notes;
-  notesField.disabled = !editMode;
+        <input
+          data-field="finish"
+          data-index="${index}"
+          value="${paint.finish}"
+          ${!editMode ? "disabled" : ""}
+        >
+
+      `;
+
+      paintContainer.appendChild(
+        card
+      );
+
+    }
+  );
+
+  notesField.value =
+    room.notes;
+
+  notesField.disabled =
+    !editMode;
 
 }
 
-floorSelect.addEventListener("change", ()=>{
-
-  currentFloor = floorSelect.value;
-
-  roomPanel.classList.add("hidden");
-  emptyState.classList.remove("hidden");
-
-  renderFloor();
-
-});
-
-drawBtn.addEventListener("click", ()=>{
+function startDrawMode(){
 
   drawMode = true;
+
   drawPoints = [];
 
-  drawBtn.classList.add("hidden");
-  finishBtn.classList.remove("hidden");
-  cancelBtn.classList.remove("hidden");
+  drawBtn.classList.add(
+    "hidden"
+  );
 
-});
+  finishBtn.classList.remove(
+    "hidden"
+  );
 
-cancelBtn.addEventListener("click", ()=>{
+  cancelBtn.classList.remove(
+    "hidden"
+  );
 
-  drawMode = false;
-  drawPoints = [];
-
-  renderFloor();
-
-  drawBtn.classList.remove("hidden");
-  finishBtn.classList.add("hidden");
-  cancelBtn.classList.add("hidden");
-
-});
-
-overlay.addEventListener("click", (event)=>{
-
-  if(!drawMode) return;
-
-  const svgRect = overlay.getBoundingClientRect();
-
-  const x = ((event.clientX - svgRect.left) / svgRect.width) * 2000;
-  const y = ((event.clientY - svgRect.top) / svgRect.height) * 743;
-
-  drawPoints.push([x,y]);
+  drawStatus.classList.remove(
+    "hidden"
+  );
 
   renderFloor();
-  renderDrawPreview();
-
-});
-
-function renderDrawPreview(){
-
-  drawPoints.forEach(point=>{
-
-    const circle = document.createElementNS(
-      "http://www.w3.org/2000/svg",
-      "circle"
-    );
-
-    circle.setAttribute("cx", point[0]);
-    circle.setAttribute("cy", point[1]);
-    circle.setAttribute("r", 5);
-    circle.setAttribute("class", "draw-point");
-
-    overlay.appendChild(circle);
-
-  });
-
-  if(drawPoints.length > 1){
-
-    const polyline = document.createElementNS(
-      "http://www.w3.org/2000/svg",
-      "polyline"
-    );
-
-    const pointString = drawPoints
-      .map(p=>`${p[0]},${p[1]}`)
-      .join(" ");
-
-    polyline.setAttribute("points", pointString);
-    polyline.setAttribute("fill", "none");
-    polyline.setAttribute("class", "temp-line");
-
-    overlay.appendChild(polyline);
-
-  }
 
 }
 
-finishBtn.addEventListener("click", ()=>{
+function cancelDrawMode(){
+
+  drawMode = false;
+
+  drawPoints = [];
+
+  drawBtn.classList.remove(
+    "hidden"
+  );
+
+  finishBtn.classList.add(
+    "hidden"
+  );
+
+  cancelBtn.classList.add(
+    "hidden"
+  );
+
+  drawStatus.classList.add(
+    "hidden"
+  );
+
+  renderFloor();
+
+}
+
+function finishDrawMode(){
 
   if(drawPoints.length < 3){
-    alert("Need at least 3 points");
+
+    alert(
+      "Need at least 3 points"
+    );
+
     return;
+
   }
 
-  const roomName = prompt("Enter room name");
+  const roomName = prompt(
+    "Enter room name"
+  );
 
   if(!roomName) return;
 
@@ -509,88 +731,320 @@ finishBtn.addEventListener("click", ()=>{
     id: roomName,
 
     points: drawPoints
-      .map(p=>`${p[0]},${p[1]}`)
+      .map(
+        p => `${p[0]},${p[1]}`
+      )
       .join(" "),
 
-    paints: [],
+    paints:[],
 
-    notes: ""
+    notes:""
 
   };
 
-  buildingData
-    .floors[currentFloor]
+  getCurrentFloorData()
     .rooms
     .push(room);
 
   saveData();
 
   drawMode = false;
+
   drawPoints = [];
 
-  drawBtn.classList.remove("hidden");
-  finishBtn.classList.add("hidden");
-  cancelBtn.classList.add("hidden");
+  drawBtn.classList.remove(
+    "hidden"
+  );
+
+  finishBtn.classList.add(
+    "hidden"
+  );
+
+  cancelBtn.classList.add(
+    "hidden"
+  );
+
+  drawStatus.classList.add(
+    "hidden"
+  );
 
   renderFloor();
 
-});
+}
 
-editBtn.addEventListener("click", ()=>{
+function renderDrawPreview(){
 
-  editMode = true;
+  drawPoints.forEach(
+    (point,index)=>{
 
-  editBtn.classList.add("hidden");
-  saveBtn.classList.remove("hidden");
-  addPaintBtn.classList.remove("hidden");
+      const circle =
+        document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "circle"
+        );
 
-  renderRoomData();
+      circle.setAttribute(
+        "cx",
+        point[0]
+      );
 
-});
+      circle.setAttribute(
+        "cy",
+        point[1]
+      );
 
-saveBtn.addEventListener("click", ()=>{
+      circle.setAttribute(
+        "r",
+        5
+      );
 
-  const room = getCurrentRoom();
+      circle.setAttribute(
+        "class",
+        "draw-point"
+      );
 
-  const inputs = document.querySelectorAll(".paint-card input");
+      overlay.appendChild(
+        circle
+      );
 
-  inputs.forEach(input=>{
+      const text =
+        document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "text"
+        );
 
-    const index = input.dataset.index;
-    const field = input.dataset.field;
+      text.setAttribute(
+        "x",
+        point[0] + 10
+      );
 
-    room.paints[index][field] = input.value;
+      text.setAttribute(
+        "y",
+        point[1] - 10
+      );
 
-  });
+      text.setAttribute(
+        "class",
+        "point-label"
+      );
 
-  room.notes = notesField.value;
+      text.textContent =
+        index + 1;
 
-  saveData();
+      overlay.appendChild(
+        text
+      );
 
-  editMode = false;
+    }
+  );
 
-  editBtn.classList.remove("hidden");
-  saveBtn.classList.add("hidden");
-  addPaintBtn.classList.add("hidden");
+  if(drawPoints.length > 1){
 
-  renderRoomData();
+    const polyline =
+      document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "polyline"
+      );
 
-});
+    polyline.setAttribute(
+      "points",
+      drawPoints
+        .map(
+          p => `${p[0]},${p[1]}`
+        )
+        .join(" ")
+    );
 
-addPaintBtn.addEventListener("click", ()=>{
+    polyline.setAttribute(
+      "class",
+      "temp-line"
+    );
 
-  const room = getCurrentRoom();
+    overlay.appendChild(
+      polyline
+    );
 
-  room.paints.push({
-    location:"",
-    color:"",
-    brand:"",
-    finish:""
-  });
+  }
 
-  renderRoomData();
+}
 
-});
+overlay.addEventListener(
+  "click",
+  (event)=>{
+
+    if(!drawMode) return;
+
+    const pt =
+      overlay.createSVGPoint();
+
+    pt.x = event.clientX;
+
+    pt.y = event.clientY;
+
+    const svgPoint =
+      pt.matrixTransform(
+        overlay
+          .getScreenCTM()
+          .inverse()
+      );
+
+    drawPoints.push([
+      svgPoint.x,
+      svgPoint.y
+    ]);
+
+    renderFloor();
+
+  }
+);
+
+drawBtn.addEventListener(
+  "click",
+  startDrawMode
+);
+
+cancelBtn.addEventListener(
+  "click",
+  cancelDrawMode
+);
+
+finishBtn.addEventListener(
+  "click",
+  finishDrawMode
+);
+
+floorSelect.addEventListener(
+  "change",
+  ()=>{
+
+    currentFloor =
+      floorSelect.value;
+
+    roomPanel.classList.add(
+      "hidden"
+    );
+
+    emptyState.classList.remove(
+      "hidden"
+    );
+
+    renderFloor();
+
+  }
+);
+
+editBtn.addEventListener(
+  "click",
+  ()=>{
+
+    editMode = true;
+
+    editBtn.classList.add(
+      "hidden"
+    );
+
+    saveBtn.classList.remove(
+      "hidden"
+    );
+
+    addPaintBtn.classList.remove(
+      "hidden"
+    );
+
+    renderRoomData();
+
+  }
+);
+
+saveBtn.addEventListener(
+  "click",
+  ()=>{
+
+    const room =
+      getCurrentRoom();
+
+    const inputs =
+      document.querySelectorAll(
+        ".paint-card input"
+      );
+
+    inputs.forEach(input=>{
+
+      const index =
+        input.dataset.index;
+
+      const field =
+        input.dataset.field;
+
+      room.paints[index][field] =
+        input.value;
+
+    });
+
+    room.notes =
+      notesField.value;
+
+    saveData();
+
+    editMode = false;
+
+    editBtn.classList.remove(
+      "hidden"
+    );
+
+    saveBtn.classList.add(
+      "hidden"
+    );
+
+    addPaintBtn.classList.add(
+      "hidden"
+    );
+
+    renderRoomData();
+
+  }
+);
+
+addPaintBtn.addEventListener(
+  "click",
+  ()=>{
+
+    getCurrentRoom()
+      .paints
+      .push({
+
+        location:"",
+        color:"",
+        brand:"",
+        finish:""
+
+      });
+
+    renderRoomData();
+
+  }
+);
+
+document.addEventListener(
+  "keydown",
+  (event)=>{
+
+    if(!drawMode) return;
+
+    if(event.key === "Escape"){
+
+      cancelDrawMode();
+
+    }
+
+    if(event.key === "Enter"){
+
+      finishDrawMode();
+
+    }
+
+  }
+);
 
 renderFloor();
 
