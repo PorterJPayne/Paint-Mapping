@@ -2,17 +2,17 @@
   "inventory": [
     {
       "inventoryId": "INV-EHG927",
-      "color": "White",
-      "code": "asdf",
+      "color": "Pure White",
+      "code": "SW7005",
       "kilnSpec": "KP001",
-      "brand": "SW",
-      "finish": "gloss",
-      "surface": "wall",
-      "hex": "#cccccc",
-      "quantity": "5",
-      "lowStock": "1",
+      "brand": "Sherwin Williams",
+      "finish": "Semi-Gloss",
+      "surface": "Walls",
+      "hex": "#EDEBE5",
+      "quantity": "1/2",
+      "lowStock": "0",
       "location": "Lehi 1 Storage",
-      "notes": "Gross"
+      "notes": "Gross. Rusty can."
     }
   ],
   "floors": {
