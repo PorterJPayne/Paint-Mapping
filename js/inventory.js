@@ -13,11 +13,6 @@ const inventorySearch =
     "inventorySearch"
   );
 
-const addInventoryBtn =
-  document.getElementById(
-    "addInventoryBtn"
-  );
-
 const backToMapBtn =
   document.getElementById(
     "backToMapBtn"
@@ -58,8 +53,9 @@ function renderInventory(){
   inventoryGrid.innerHTML = "";
 
   const search =
-    inventorySearch.value
-      .toLowerCase();
+    (
+      inventorySearch.value || ""
+    ).toLowerCase();
 
   const filtered =
     buildingData.inventory.filter(
@@ -172,16 +168,27 @@ function openInventoryModal(paint){
         ${paint.color || ""}
       </h2>
 
-      <input id="invColor" value="${paint.color || ""}">
-      <input id="invCode" value="${paint.code || ""}">
-      <input id="invKiln" value="${paint.kilnSpec || ""}">
-      <input id="invBrand" value="${paint.brand || ""}">
-      <input id="invFinish" value="${paint.finish || ""}">
-      <input id="invHex" value="${paint.hex || ""}">
-      <input id="invQuantity" value="${paint.quantity || ""}">
-      <input id="invLocation" value="${paint.location || ""}">
+      <input id="invColor" placeholder="Color Name" value="${paint.color || ""}">
 
-      <textarea id="invNotes">${paint.notes || ""}</textarea>
+      <input id="invCode" placeholder="Code" value="${paint.code || ""}">
+
+      <input id="invKiln" placeholder="Kiln Spec" value="${paint.kilnSpec || ""}">
+
+      <input id="invBrand" placeholder="Brand" value="${paint.brand || ""}">
+
+      <input id="invFinish" placeholder="Finish" value="${paint.finish || ""}">
+
+      <input id="invSurface" placeholder="Surface" value="${paint.surface || ""}">
+
+      <input id="invHex" placeholder="Hex Color" value="${paint.hex || ""}">
+
+      <input id="invQuantity" placeholder="Quantity" value="${paint.quantity || ""}">
+
+      <input id="invLowStock" placeholder="Low Stock Threshold" value="${paint.lowStock || ""}">
+
+      <input id="invLocation" placeholder="Storage Location" value="${paint.location || ""}">
+
+      <textarea id="invNotes" placeholder="Notes">${paint.notes || ""}</textarea>
 
       <button id="saveInventoryPaint">
         Save
@@ -242,6 +249,11 @@ function openInventoryModal(paint){
         "invFinish"
       ).value;
 
+    paint.surface =
+      document.getElementById(
+        "invSurface"
+      ).value;
+
     paint.hex =
       document.getElementById(
         "invHex"
@@ -250,6 +262,11 @@ function openInventoryModal(paint){
     paint.quantity =
       document.getElementById(
         "invQuantity"
+      ).value;
+
+    paint.lowStock =
+      document.getElementById(
+        "invLowStock"
       ).value;
 
     paint.location =
@@ -265,6 +282,12 @@ function openInventoryModal(paint){
     saveData();
 
     renderInventory();
+
+    if(currentRoom){
+
+      selectRoom(currentRoom);
+
+    }
 
     modal.remove();
 
@@ -314,48 +337,49 @@ function openInventoryModal(paint){
 
 }
 
-document.getElementById(
-  "addInventoryBtn"
-).onclick = ()=>{
+window.addEventListener(
+  "load",
+  ()=>{
 
-  const newPaint = {
+    document.getElementById(
+      "addInventoryBtn"
+    ).onclick = ()=>{
 
-    inventoryId:
-      createInventoryId(),
+      const newPaint = {
 
-    color:"",
+        inventoryId:
+          createInventoryId(),
 
-    code:"",
+        color:"",
+        code:"",
+        kilnSpec:"",
+        brand:"",
+        finish:"",
+        surface:"",
+        hex:"#cccccc",
+        quantity:"",
+        lowStock:"",
+        location:"",
+        notes:""
 
-    kilnSpec:"",
+      };
 
-    brand:"",
+      buildingData.inventory.push(
+        newPaint
+      );
 
-    finish:"",
+      saveData();
 
-    surface:"",
+      renderInventory();
 
-    hex:"#cccccc",
+      openInventoryModal(
+        newPaint
+      );
 
-    quantity:"",
+    };
 
-    lowStock:"",
+  }
+);
 
-    location:"",
-
-    notes:""
-
-  };
-
-  buildingData.inventory.push(
-    newPaint
-  );
-
-  saveData();
-
-  renderInventory();
-
-
-};
 inventorySearch.oninput =
   renderInventory;
