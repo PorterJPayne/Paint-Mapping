@@ -22,7 +22,6 @@ const cancelBtn = document.getElementById("cancelBtn");
 const editBtn = document.getElementById("editBtn");
 const saveBtn = document.getElementById("saveBtn");
 const cancelEditBtn = document.getElementById("cancelEditBtn");
-const addPaintBtn = document.getElementById("addPaintBtn");
 
 const exportBtn = document.getElementById("exportBtn");
 const importBtn = document.getElementById("importBtn");
@@ -52,6 +51,8 @@ let draggingMap = false;
 
 let dragStartX = 0;
 let dragStartY = 0;
+
+let draggingVertex = null;
 
 const defaultData = {
 
@@ -198,6 +199,54 @@ function renderRoomList(){
 
 }
 
+function renderVertices(room){
+
+  if(!editMode) return;
+
+  const points =
+    room.points
+      .split(" ")
+      .map(
+        p => p.split(",").map(Number)
+      );
+
+  points.forEach((point,index)=>{
+
+    const vertex =
+      document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "circle"
+      );
+
+    vertex.setAttribute("cx",point[0]);
+    vertex.setAttribute("cy",point[1]);
+    vertex.setAttribute("r",7);
+
+    vertex.setAttribute(
+      "class",
+      "vertex"
+    );
+
+    vertex.addEventListener(
+      "mousedown",
+      (e)=>{
+
+        e.stopPropagation();
+
+        draggingVertex = {
+          room,
+          index
+        };
+
+      }
+    );
+
+    overlay.appendChild(vertex);
+
+  });
+
+}
+
 function renderFloor(){
 
   overlay.innerHTML = "";
@@ -238,6 +287,12 @@ function renderFloor(){
     };
 
     overlay.appendChild(polygon);
+
+    if(room.id === currentRoom){
+
+      renderVertices(room);
+
+    }
 
   });
 
@@ -305,6 +360,11 @@ function renderSidebar(room){
 
         <div class="paint-code">
           ${paint.code || ""}
+        </div>
+
+        <div style="margin-bottom:12px;">
+          <strong>Kiln Spec:</strong>
+          ${paint.kilnSpec || ""}
         </div>
 
         <div class="paint-meta">
@@ -400,6 +460,7 @@ function renderSidebar(room){
         surface:"",
         color:"",
         code:"",
+        kilnSpec:"",
         finish:"",
         brand:""
 
@@ -409,9 +470,24 @@ function renderSidebar(room){
 
     };
 
-    controls.appendChild(dropdown);
+    const deleteRoomBtn =
+      document.createElement("button");
 
+    deleteRoomBtn.textContent =
+      "Delete Room";
+
+    deleteRoomBtn.style.background =
+      "#b42318";
+
+    deleteRoomBtn.style.marginTop =
+      "10px";
+
+    deleteRoomBtn.onclick =
+      deleteCurrentRoom;
+
+    controls.appendChild(dropdown);
     controls.appendChild(addManualBtn);
+    controls.appendChild(deleteRoomBtn);
 
     paintContainer.appendChild(controls);
 
@@ -444,6 +520,13 @@ function renderSidebar(room){
           data-field="code"
           data-index="${index}"
           value="${paint.code || ""}"
+        >
+
+        <input
+          placeholder="Kiln Spec Number"
+          data-field="kilnSpec"
+          data-index="${index}"
+          value="${paint.kilnSpec || ""}"
         >
 
         <input
@@ -530,20 +613,9 @@ function renderDrawPreview(){
         "circle"
       );
 
-    circle.setAttribute(
-      "cx",
-      point[0]
-    );
-
-    circle.setAttribute(
-      "cy",
-      point[1]
-    );
-
-    circle.setAttribute(
-      "r",
-      6
-    );
+    circle.setAttribute("cx",point[0]);
+    circle.setAttribute("cy",point[1]);
+    circle.setAttribute("r",6);
 
     circle.setAttribute(
       "class",
@@ -551,42 +623,6 @@ function renderDrawPreview(){
     );
 
     overlay.appendChild(circle);
-
-    const label =
-      document.createElementNS(
-        "http://www.w3.org/2000/svg",
-        "text"
-      );
-
-    label.setAttribute(
-      "x",
-      point[0] + 10
-    );
-
-    label.setAttribute(
-      "y",
-      point[1] - 10
-    );
-
-    label.setAttribute(
-      "fill",
-      "red"
-    );
-
-    label.setAttribute(
-      "font-size",
-      "18"
-    );
-
-    label.setAttribute(
-      "font-weight",
-      "bold"
-    );
-
-    label.textContent =
-      index + 1;
-
-    overlay.appendChild(label);
 
   });
 
@@ -851,6 +887,8 @@ editBtn.onclick = ()=>{
 
   renderSidebar(room);
 
+  renderFloor();
+
 };
 
 cancelEditBtn.onclick = ()=>{
@@ -1001,6 +1039,40 @@ document.addEventListener(
   "mousemove",
   (e)=>{
 
+    if(draggingVertex){
+
+      const rect =
+        overlay.getBoundingClientRect();
+
+      const x =
+        ((e.clientX - rect.left)
+        / rect.width)
+        * MAP_WIDTH;
+
+      const y =
+        ((e.clientY - rect.top)
+        / rect.height)
+        * MAP_HEIGHT;
+
+      const room =
+        draggingVertex.room;
+
+      const points =
+        room.points
+          .split(" ");
+
+      points[draggingVertex.index] =
+        `${x},${y}`;
+
+      room.points =
+        points.join(" ");
+
+      renderFloor();
+
+      return;
+
+    }
+
     if(!draggingMap) return;
 
     panX =
@@ -1019,6 +1091,14 @@ document.addEventListener(
   ()=>{
 
     draggingMap = false;
+
+    if(draggingVertex){
+
+      saveData();
+
+    }
+
+    draggingVertex = null;
 
   }
 );
