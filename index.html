@@ -3,16 +3,16 @@
 
 <head>
 
-<meta charset="UTF-8">
+  <meta charset="UTF-8">
 
-<meta
-  name="viewport"
-  content="width=device-width, initial-scale=1.0"
->
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
-<title>Paint Map Manager</title>
+  <title>Paint Map Manager</title>
 
-<link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css">
 
 </head>
 
@@ -22,9 +22,7 @@
 
   <div class="topbar-left">
 
-    <h2>
-      Paint Map Manager
-    </h2>
+    <h2>Paint Map Manager</h2>
 
     <input
       type="text"
@@ -36,47 +34,28 @@
 
   <div class="topbar-right">
 
-    <button id="exportBtn">
-      Export
-    </button>
-
-    <button id="importBtn">
-      Import
-    </button>
-
-    <input
-      type="file"
-      id="importFile"
-      hidden
-    >
-
     <button id="drawBtn">
       Draw Room
     </button>
 
-    <button
-      id="undoBtn"
-      class="hidden"
-    >
+    <button id="undoBtn" class="hidden">
       Undo Point
     </button>
 
-    <button
-      id="finishBtn"
-      class="hidden"
-    >
+    <button id="finishBtn" class="hidden">
       Finish Room
     </button>
 
-    <button
-      id="cancelBtn"
-      class="hidden"
-    >
+    <button id="cancelBtn" class="hidden">
       Cancel
     </button>
 
     <button id="resetViewBtn">
       Reset View
+    </button>
+
+    <button id="inventoryBtn">
+      Inventory
     </button>
 
     <select id="floorSelect">
@@ -103,9 +82,7 @@
 
   <aside class="room-list">
 
-    <h3>
-      Rooms
-    </h3>
+    <h3>Rooms</h3>
 
     <div id="roomList"></div>
 
@@ -117,21 +94,7 @@
       id="drawStatus"
       class="draw-status hidden"
     >
-
       Drawing Mode
-
-      <br><br>
-
-      Click to add points
-
-      <br>
-
-      Enter = Finish
-
-      <br>
-
-      Backspace = Undo
-
     </div>
 
     <div
@@ -148,7 +111,7 @@
 
           <img
             id="floorImage"
-            src="1st-floor.png"
+            src="images/1st-floor.png"
           >
 
           <svg
@@ -169,9 +132,7 @@
 
     <div id="emptyState">
 
-      <h2>
-        Select a room
-      </h2>
+      <h2>Select a room</h2>
 
     </div>
 
@@ -208,16 +169,7 @@
 
       <div id="paintContainer"></div>
 
-      <button
-        id="addPaintBtn"
-        class="hidden"
-      >
-        + Add Paint
-      </button>
-
-      <h3>
-        Notes
-      </h3>
+      <h3>Notes</h3>
 
       <div
         id="notesDisplay"
@@ -238,7 +190,17 @@
 
 </div>
 
-<script src="script.js"></script>
+<script src="js/state.js"></script>
+<script src="js/dom.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/map.js"></script>
+<script src="js/draw.js"></script>
+<script src="js/rooms.js"></script>
+<script src="js/sidebar.js"></script>
+<script src="js/zoom.js"></script>
+<script src="js/inventory.js"></script>
+<script src="js/app.js"></script>
 
 </body>
 
