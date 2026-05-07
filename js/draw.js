@@ -1,6 +1,6 @@
 function renderDrawPreview(){
 
-  drawPoints.forEach(point=>{
+  drawPoints.forEach((point,index)=>{
 
     const circle =
       document.createElementNS(
@@ -10,6 +10,7 @@ function renderDrawPreview(){
 
     circle.setAttribute("cx",point[0]);
     circle.setAttribute("cy",point[1]);
+
     circle.setAttribute("r",6);
 
     circle.setAttribute(
@@ -19,7 +20,69 @@ function renderDrawPreview(){
 
     overlay.appendChild(circle);
 
+    const label =
+      document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "text"
+      );
+
+    label.setAttribute(
+      "x",
+      point[0] + 10
+    );
+
+    label.setAttribute(
+      "y",
+      point[1] - 10
+    );
+
+    label.setAttribute(
+      "fill",
+      "red"
+    );
+
+    label.setAttribute(
+      "font-size",
+      "18"
+    );
+
+    label.setAttribute(
+      "font-weight",
+      "bold"
+    );
+
+    label.textContent =
+      index + 1;
+
+    overlay.appendChild(label);
+
   });
+
+  if(drawPoints.length > 1){
+
+    const line =
+      document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "polyline"
+      );
+
+    line.setAttribute(
+      "points",
+      drawPoints
+        .map(
+          p => `${p[0]},${p[1]}`
+        )
+        .join(" ")
+    );
+
+    line.setAttribute(
+      "class",
+      "temp-line"
+    );
+
+    overlay.appendChild(line);
+
+  }
 
 }
 
