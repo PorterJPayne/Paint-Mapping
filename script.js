@@ -401,7 +401,9 @@ function renderSidebar(room){
 
 function renderDrawPreview(){
 
-  drawPoints.forEach(point=>{
+  drawPoints.forEach((point,index)=>{
+
+    // POINT
 
     const circle =
       document.createElementNS(
@@ -421,7 +423,7 @@ function renderDrawPreview(){
 
     circle.setAttribute(
       "r",
-      5
+      6
     );
 
     circle.setAttribute(
@@ -431,7 +433,47 @@ function renderDrawPreview(){
 
     overlay.appendChild(circle);
 
+    // NUMBER LABEL
+
+    const label =
+      document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "text"
+      );
+
+    label.setAttribute(
+      "x",
+      point[0] + 10
+    );
+
+    label.setAttribute(
+      "y",
+      point[1] - 10
+    );
+
+    label.setAttribute(
+      "fill",
+      "red"
+    );
+
+    label.setAttribute(
+      "font-size",
+      "18"
+    );
+
+    label.setAttribute(
+      "font-weight",
+      "bold"
+    );
+
+    label.textContent =
+      index + 1;
+
+    overlay.appendChild(label);
+
   });
+
+  // DRAW TEMP LINE
 
   if(drawPoints.length > 1){
 
