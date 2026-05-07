@@ -314,7 +314,9 @@ function openInventoryModal(paint){
 
 }
 
-addInventoryBtn.onclick = ()=>{
+document.getElementById(
+  "addInventoryBtn"
+).onclick = ()=>{
 
   const newPaint = {
 
@@ -331,9 +333,13 @@ addInventoryBtn.onclick = ()=>{
 
     finish:"",
 
+    surface:"",
+
     hex:"#cccccc",
 
     quantity:"",
+
+    lowStock:"",
 
     location:"",
 
@@ -354,6 +360,5 @@ addInventoryBtn.onclick = ()=>{
   );
 
 };
-
 inventorySearch.oninput =
   renderInventory;
