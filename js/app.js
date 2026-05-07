@@ -15,7 +15,7 @@ undoBtn.onclick = ()=>{
 finishBtn.onclick =
   finishDraw;
 
-// DRAW CLICKING
+// DRAW CLICK
 
 overlay.addEventListener(
   "click",
@@ -159,7 +159,7 @@ mapViewport.addEventListener(
   { passive:false }
 );
 
-// PAN
+// PAN + VERTEX DRAGGING
 
 mapViewport.addEventListener(
   "mousedown",
@@ -202,8 +202,9 @@ document.addEventListener(
         room.points
           .split(" ");
 
-      points[draggingVertex.index] =
-        `${x},${y}`;
+      points[
+        draggingVertex.index
+      ] = `${x},${y}`;
 
       room.points =
         points.join(" ");
