@@ -270,9 +270,26 @@ resetViewBtn.onclick = ()=>{
 
 // STARTUP
 
+// STARTUP
+
 window.addEventListener(
   "load",
-  ()=>{
+  async ()=>{
+
+    try{
+
+      await loadCloudData();
+
+    }
+
+    catch(error){
+
+      console.error(
+        "Cloud load failed",
+        error
+      );
+
+    }
 
     centerMap();
 
