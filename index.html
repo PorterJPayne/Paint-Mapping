@@ -37,6 +37,7 @@ body{
 .topbar-left{
   display:flex;
   align-items:center;
+  gap:16px;
 }
 
 .topbar-right{
@@ -166,6 +167,7 @@ button.danger{
   padding-bottom:14px;
   margin-bottom:18px;
   border-bottom:1px solid #ddd;
+  z-index:20;
 }
 
 .room-title{
@@ -260,6 +262,20 @@ textarea{
   display:flex;
   gap:10px;
   margin-top:12px;
+  flex-wrap:wrap;
+}
+
+.search-input{
+  width:240px;
+  padding:10px 12px;
+  border:1px solid #ccc;
+  border-radius:8px;
+}
+
+.save-indicator{
+  font-size:13px;
+  color:#1d7a34;
+  font-weight:bold;
 }
 
 </style>
@@ -276,12 +292,33 @@ textarea{
       Paint Map Manager
     </h2>
 
+    <input
+      type="text"
+      id="searchInput"
+      class="search-input"
+      placeholder="Search room..."
+    >
+
   </div>
 
   <div class="topbar-right">
 
+    <div
+      id="saveIndicator"
+      class="save-indicator"
+    >
+      Saved
+    </div>
+
     <button id="drawBtn">
       Draw Room
+    </button>
+
+    <button
+      id="undoBtn"
+      class="hidden secondary"
+    >
+      Undo Point
     </button>
 
     <button
@@ -331,13 +368,17 @@ textarea{
 
         Drawing Room...
 
-        <br>
+        <br><br>
 
         ENTER = Finish
 
         <br>
 
         ESC = Cancel
+
+        <br>
+
+        BACKSPACE = Undo
 
       </div>
 
@@ -395,9 +436,7 @@ textarea{
           class="floor-label"
         ></div>
 
-        <div
-          class="edit-buttons"
-        >
+        <div class="edit-buttons">
 
           <button id="editBtn">
             Edit
@@ -417,6 +456,13 @@ textarea{
             Cancel
           </button>
 
+          <button
+            id="deleteRoomBtn"
+            class="danger"
+          >
+            Delete Room
+          </button>
+
         </div>
 
       </div>
@@ -430,9 +476,7 @@ textarea{
         + Add Paint
       </button>
 
-      <div
-        class="notes-section"
-      >
+      <div class="notes-section">
 
         <h3>
           Notes
@@ -473,6 +517,9 @@ const overlay =
 const drawBtn =
   document.getElementById("drawBtn");
 
+const undoBtn =
+  document.getElementById("undoBtn");
+
 const finishBtn =
   document.getElementById("finishBtn");
 
@@ -512,8 +559,17 @@ const saveBtn =
 const cancelEditBtn =
   document.getElementById("cancelEditBtn");
 
+const deleteRoomBtn =
+  document.getElementById("deleteRoomBtn");
+
 const addPaintBtn =
   document.getElementById("addPaintBtn");
+
+const searchInput =
+  document.getElementById("searchInput");
+
+const saveIndicator =
+  document.getElementById("saveIndicator");
 
 let currentFloor = "1st-floor";
 
@@ -525,37 +581,44 @@ let drawMode = false;
 
 let drawPoints = [];
 
+let lastSelectedRoom = {};
+
 const defaultBuildingData = {
 
   floors: {
 
     "1st-floor": {
-
       image:"1st-floor.png",
-
       rooms:[]
-
     },
 
     "2nd-floor": {
-
       image:"2nd-floor.png",
-
       rooms:[]
-
     },
 
     "5th-floor": {
-
       image:"5th-floor.png",
-
       rooms:[]
-
     }
 
   }
 
 };
+
+function showSaved(){
+
+  saveIndicator.textContent =
+    "Saved";
+
+  setTimeout(()=>{
+
+    saveIndicator.textContent =
+      "";
+
+  },1500);
+
+}
 
 function loadData(){
 
@@ -590,6 +653,8 @@ function saveData(){
     JSON.stringify(buildingData)
   );
 
+  showSaved();
+
 }
 
 function getCurrentFloorData(){
@@ -618,7 +683,7 @@ function renderFloor(){
 
   floorImage.src = floor.image;
 
-  floor.rooms.forEach(room => {
+  floor.rooms.forEach(room=>{
 
     const polygon =
       document.createElementNS(
@@ -636,6 +701,9 @@ function renderFloor(){
       "room"
     );
 
+    polygon.dataset.roomId =
+      room.id;
+
     polygon.addEventListener(
       "click",
       (event)=>{
@@ -645,16 +713,6 @@ function renderFloor(){
         event.stopPropagation();
 
         selectRoom(room.id);
-
-        document
-          .querySelectorAll(".room")
-          .forEach(r=>{
-            r.classList.remove("active");
-          });
-
-        polygon.classList.add(
-          "active"
-        );
 
       }
     );
@@ -671,11 +729,39 @@ function renderFloor(){
 
   }
 
+  highlightSelectedRoom();
+
+}
+
+function highlightSelectedRoom(){
+
+  document
+    .querySelectorAll(".room")
+    .forEach(room=>{
+      room.classList.remove("active");
+    });
+
+  const selected =
+    [...document.querySelectorAll(".room")]
+    .find(
+      room =>
+      room.dataset.roomId === currentRoom
+    );
+
+  if(selected){
+
+    selected.classList.add("active");
+
+  }
+
 }
 
 function selectRoom(roomId){
 
   currentRoom = roomId;
+
+  lastSelectedRoom[currentFloor] =
+    roomId;
 
   const room =
     getCurrentRoom();
@@ -699,6 +785,8 @@ function selectRoom(roomId){
       .replace("floor", "Floor");
 
   renderRoomData();
+
+  highlightSelectedRoom();
 
 }
 
@@ -788,9 +876,7 @@ function renderRoomData(){
 
         card.innerHTML = `
 
-          <label>
-            Surface
-          </label>
+          <label>Surface</label>
 
           <input
             data-field="surface"
@@ -798,9 +884,7 @@ function renderRoomData(){
             value="${paint.surface || ""}"
           >
 
-          <label>
-            Color Name
-          </label>
+          <label>Color Name</label>
 
           <input
             data-field="color"
@@ -808,9 +892,7 @@ function renderRoomData(){
             value="${paint.color || ""}"
           >
 
-          <label>
-            Paint Code
-          </label>
+          <label>Paint Code</label>
 
           <input
             data-field="code"
@@ -818,9 +900,7 @@ function renderRoomData(){
             value="${paint.code || ""}"
           >
 
-          <label>
-            Finish
-          </label>
+          <label>Finish</label>
 
           <input
             data-field="finish"
@@ -828,9 +908,7 @@ function renderRoomData(){
             value="${paint.finish || ""}"
           >
 
-          <label>
-            Brand
-          </label>
+          <label>Brand</label>
 
           <input
             data-field="brand"
@@ -866,12 +944,43 @@ function deletePaint(index){
 
   if(!confirmed) return;
 
-  const room =
-    getCurrentRoom();
-
-  room.paints.splice(index,1);
+  getCurrentRoom()
+    .paints
+    .splice(index,1);
 
   renderRoomData();
+
+}
+
+function deleteRoom(){
+
+  const confirmed = confirm(
+    `Delete room "${currentRoom}"?`
+  );
+
+  if(!confirmed) return;
+
+  const floor =
+    getCurrentFloorData();
+
+  floor.rooms =
+    floor.rooms.filter(
+      room => room.id !== currentRoom
+    );
+
+  saveData();
+
+  currentRoom = null;
+
+  roomPanel.classList.add(
+    "hidden"
+  );
+
+  emptyState.classList.remove(
+    "hidden"
+  );
+
+  renderFloor();
 
 }
 
@@ -882,6 +991,10 @@ function startDrawMode(){
   drawPoints = [];
 
   drawBtn.classList.add(
+    "hidden"
+  );
+
+  undoBtn.classList.remove(
     "hidden"
   );
 
@@ -911,6 +1024,10 @@ function cancelDrawMode(){
     "hidden"
   );
 
+  undoBtn.classList.add(
+    "hidden"
+  );
+
   finishBtn.classList.add(
     "hidden"
   );
@@ -922,6 +1039,14 @@ function cancelDrawMode(){
   drawStatus.classList.add(
     "hidden"
   );
+
+  renderFloor();
+
+}
+
+function undoLastPoint(){
+
+  drawPoints.pop();
 
   renderFloor();
 
@@ -944,6 +1069,25 @@ function finishDrawMode(){
   );
 
   if(!roomName) return;
+
+  const existingRoom =
+    getCurrentFloorData()
+      .rooms
+      .find(
+        room =>
+        room.id.toLowerCase()
+        === roomName.toLowerCase()
+      );
+
+  if(existingRoom){
+
+    alert(
+      "Room already exists"
+    );
+
+    return;
+
+  }
 
   const room = {
 
@@ -972,6 +1116,10 @@ function finishDrawMode(){
   drawPoints = [];
 
   drawBtn.classList.remove(
+    "hidden"
+  );
+
+  undoBtn.classList.add(
     "hidden"
   );
 
@@ -1122,6 +1270,11 @@ drawBtn.addEventListener(
   startDrawMode
 );
 
+undoBtn.addEventListener(
+  "click",
+  undoLastPoint
+);
+
 cancelBtn.addEventListener(
   "click",
   cancelDrawMode
@@ -1132,6 +1285,11 @@ finishBtn.addEventListener(
   finishDrawMode
 );
 
+deleteRoomBtn.addEventListener(
+  "click",
+  deleteRoom
+);
+
 floorSelect.addEventListener(
   "change",
   ()=>{
@@ -1139,15 +1297,28 @@ floorSelect.addEventListener(
     currentFloor =
       floorSelect.value;
 
-    roomPanel.classList.add(
-      "hidden"
-    );
-
-    emptyState.classList.remove(
-      "hidden"
-    );
-
     renderFloor();
+
+    const rememberedRoom =
+      lastSelectedRoom[currentFloor];
+
+    if(rememberedRoom){
+
+      selectRoom(rememberedRoom);
+
+    }
+
+    else{
+
+      roomPanel.classList.add(
+        "hidden"
+      );
+
+      emptyState.classList.remove(
+        "hidden"
+      );
+
+    }
 
   }
 );
@@ -1307,6 +1478,50 @@ addPaintBtn.addEventListener(
   }
 );
 
+searchInput.addEventListener(
+  "input",
+  ()=>{
+
+    const value =
+      searchInput.value
+      .toLowerCase()
+      .trim();
+
+    if(!value){
+
+      highlightSelectedRoom();
+
+      return;
+
+    }
+
+    document
+      .querySelectorAll(".room")
+      .forEach(room=>{
+
+        const roomId =
+          room.dataset.roomId
+          .toLowerCase();
+
+        if(roomId.includes(value)){
+
+          room.style.fill =
+            "rgba(255,165,0,0.45)";
+
+        }
+
+        else{
+
+          room.style.fill =
+            "rgba(0,150,255,0.08)";
+
+        }
+
+      });
+
+  }
+);
+
 document.addEventListener(
   "keydown",
   (event)=>{
@@ -1322,6 +1537,16 @@ document.addEventListener(
     if(event.key === "Enter"){
 
       finishDrawMode();
+
+    }
+
+    if(
+      event.key === "Backspace"
+      ||
+      event.key.toLowerCase() === "z"
+    ){
+
+      undoLastPoint();
 
     }
 
