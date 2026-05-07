@@ -28,18 +28,12 @@
     <input
       type="text"
       id="searchInput"
-      class="search-input"
       placeholder="Search room..."
     >
 
   </div>
 
   <div class="topbar-right">
-
-    <div
-      id="saveIndicator"
-      class="save-indicator"
-    ></div>
 
     <button id="exportBtn">
       Export
@@ -61,7 +55,7 @@
 
     <button
       id="undoBtn"
-      class="hidden secondary"
+      class="hidden"
     >
       Undo Point
     </button>
@@ -75,15 +69,12 @@
 
     <button
       id="cancelBtn"
-      class="hidden secondary"
+      class="hidden"
     >
       Cancel
     </button>
 
-    <button
-      id="resetViewBtn"
-      class="secondary"
-    >
+    <button id="resetViewBtn">
       Reset View
     </button>
 
@@ -119,167 +110,133 @@
 
   </aside>
 
-  <div class="layout-main">
+  <section class="map-section">
 
-    <section class="map-section">
+    <div
+      id="drawStatus"
+      class="draw-status hidden"
+    >
+
+      Drawing Room
+
+      <br><br>
+
+      Enter = Finish
+
+      <br>
+
+      Backspace = Undo
+
+    </div>
+
+    <div
+      id="mapViewport"
+      class="map-viewport"
+    >
 
       <div
-        id="drawStatus"
-        class="draw-status hidden"
+        id="mapTransform"
+        class="map-transform"
       >
 
-        Drawing Room...
+        <div class="map-container">
 
-        <br><br>
+          <img
+            id="floorImage"
+            src="1st-floor.png"
+          >
 
-        ENTER = Finish
-
-        <br>
-
-        ESC = Cancel
-
-        <br>
-
-        BACKSPACE = Undo
-
-      </div>
-
-      <div
-        id="mapViewport"
-        class="map-viewport"
-      >
-
-        <div
-          id="mapTransform"
-          class="map-transform"
-        >
-
-          <div class="map-container">
-
-            <img
-              id="floorImage"
-              src="1st-floor.png"
-            >
-
-            <svg
-              id="overlay"
-              viewBox="0 0 2000 743"
-              preserveAspectRatio="none"
-            ></svg>
-
-          </div>
+          <svg
+            id="overlay"
+            viewBox="0 0 2000 743"
+            preserveAspectRatio="none"
+          ></svg>
 
         </div>
 
       </div>
 
-      <div class="zoom-controls">
+    </div>
 
-        <button id="zoomInBtn">
-          +
+  </section>
+
+  <aside class="sidebar">
+
+    <div id="emptyState">
+
+      <h2>
+        Select a room
+      </h2>
+
+    </div>
+
+    <div
+      id="roomPanel"
+      class="hidden"
+    >
+
+      <h1 id="roomTitle"></h1>
+
+      <div id="floorLabel"></div>
+
+      <div class="sidebar-buttons">
+
+        <button id="editBtn">
+          Edit
         </button>
-
-        <button id="zoomOutBtn">
-          −
-        </button>
-
-      </div>
-
-    </section>
-
-    <aside class="sidebar">
-
-      <div id="emptyState">
-
-        <h2>
-          Select a room
-        </h2>
-
-      </div>
-
-      <div
-        id="roomPanel"
-        class="hidden"
-      >
-
-        <div class="room-header">
-
-          <h1
-            id="roomTitle"
-            class="room-title"
-          ></h1>
-
-          <div
-            id="floorLabel"
-            class="floor-label"
-          ></div>
-
-          <div class="edit-buttons">
-
-            <button id="editBtn">
-              Edit
-            </button>
-
-            <button
-              id="saveBtn"
-              class="hidden"
-            >
-              Save
-            </button>
-
-            <button
-              id="cancelEditBtn"
-              class="hidden secondary"
-            >
-              Cancel
-            </button>
-
-            <button
-              id="deleteRoomBtn"
-              class="hidden small-danger"
-            >
-              Delete Room
-            </button>
-
-          </div>
-
-        </div>
-
-        <div id="paintContainer"></div>
 
         <button
-          id="addPaintBtn"
+          id="saveBtn"
           class="hidden"
         >
-          + Add Paint
+          Save
         </button>
 
-        <div class="notes-section">
+        <button
+          id="cancelEditBtn"
+          class="hidden"
+        >
+          Cancel
+        </button>
 
-          <h3>
-            Notes
-          </h3>
-
-          <div
-            id="notesDisplay"
-            class="notes-text"
-          >
-            No notes
-          </div>
-
-          <textarea
-            id="notesField"
-            rows="5"
-            class="hidden"
-          ></textarea>
-
-        </div>
+        <button
+          id="deleteRoomBtn"
+          class="hidden danger"
+        >
+          Delete Room
+        </button>
 
       </div>
 
-    </aside>
+      <div id="paintContainer"></div>
 
-  </div>
+      <button
+        id="addPaintBtn"
+        class="hidden"
+      >
+        + Add Paint
+      </button>
+
+      <h3>
+        Notes
+      </h3>
+
+      <div
+        id="notesDisplay"
+        class="notes-box"
+      >
+        No notes
+      </div>
+
+      <textarea
+        id="notesField"
+        rows="5"
+        class="hidden"
+      ></textarea>
+
+    </div>
+
+  </aside>
 
 </div>
 
