@@ -54,7 +54,11 @@ let dragStartY = 0;
 
 let draggingVertex = null;
 
+let currentView = "map";
+
 const defaultData = {
+
+  inventory:[],
 
   floors:{
 
@@ -105,9 +109,19 @@ function getCurrentRoom(){
 
 }
 
-function getPaintLibrary(){
+function createInventoryId(){
 
-  const map = new Map();
+  return "INV-" +
+    Math.random()
+      .toString(36)
+      .substring(2,8)
+      .toUpperCase();
+
+}
+
+function getInventoryUsageCount(id){
+
+  let count = 0;
 
   Object.values(buildingData.floors)
     .forEach(floor=>{
@@ -116,10 +130,11 @@ function getPaintLibrary(){
 
         room.paints.forEach(paint=>{
 
-          const key =
-            JSON.stringify(paint);
+          if(paint.inventoryId === id){
 
-          map.set(key,paint);
+            count++;
+
+          }
 
         });
 
@@ -127,7 +142,7 @@ function getPaintLibrary(){
 
     });
 
-  return [...map.values()];
+  return count;
 
 }
 
@@ -165,6 +180,322 @@ function centerMap(){
     (h - (MAP_HEIGHT * zoom)) / 2;
 
   updateTransform();
+
+}
+
+function ensureInventoryButton(){
+
+  if(
+    document.getElementById(
+      "inventoryNavBtn"
+    )
+  ) return;
+
+  const button =
+    document.createElement("button");
+
+  button.id =
+    "inventoryNavBtn";
+
+  button.textContent =
+    "Inventory";
+
+  button.onclick = ()=>{
+
+    openInventoryView();
+
+  };
+
+  document.querySelector(
+    ".topbar-left"
+  ).appendChild(button);
+
+}
+
+function openInventoryView(){
+
+  currentView = "inventory";
+
+  document.querySelector(
+    ".map-section"
+  ).style.display = "none";
+
+  document.querySelector(
+    ".room-list"
+  ).style.display = "none";
+
+  roomPanel.classList.remove(
+    "hidden"
+  );
+
+  emptyState.classList.add(
+    "hidden"
+  );
+
+  roomTitle.textContent =
+    "Paint Inventory";
+
+  floorLabel.textContent =
+    "";
+
+  renderInventory();
+
+}
+
+function openMapView(){
+
+  currentView = "map";
+
+  document.querySelector(
+    ".map-section"
+  ).style.display = "";
+
+  document.querySelector(
+    ".room-list"
+  ).style.display = "";
+
+  renderFloor();
+
+}
+
+function renderInventory(){
+
+  paintContainer.innerHTML = "";
+
+  const topBar =
+    document.createElement("div");
+
+  topBar.style.marginBottom =
+    "20px";
+
+  const backBtn =
+    document.createElement("button");
+
+  backBtn.textContent =
+    "Back To Map";
+
+  backBtn.onclick =
+    openMapView;
+
+  const addBtn =
+    document.createElement("button");
+
+  addBtn.textContent =
+    "+ Add Inventory Paint";
+
+  addBtn.style.marginLeft =
+    "10px";
+
+  addBtn.onclick = ()=>{
+
+    buildingData.inventory.push({
+
+      inventoryId:
+        createInventoryId(),
+
+      color:"",
+      code:"",
+      kilnSpec:"",
+      finish:"",
+      brand:"",
+      quantity:"",
+      unit:"",
+      location:"",
+      vendor:"",
+      notes:"",
+      lowStock:""
+
+    });
+
+    saveData();
+
+    renderInventory();
+
+  };
+
+  topBar.appendChild(backBtn);
+  topBar.appendChild(addBtn);
+
+  paintContainer.appendChild(topBar);
+
+  buildingData.inventory.forEach(
+    (paint,index)=>{
+
+      const usage =
+        getInventoryUsageCount(
+          paint.inventoryId
+        );
+
+      const low =
+        Number(paint.quantity)
+        <= Number(paint.lowStock);
+
+      const card =
+        document.createElement("div");
+
+      card.className =
+        "edit-card";
+
+      if(low){
+
+        card.style.border =
+          "2px solid #d92d20";
+
+      }
+
+      card.innerHTML = `
+
+        <div style="
+          font-size:12px;
+          color:#666;
+          margin-bottom:8px;
+        ">
+          ${paint.inventoryId}
+        </div>
+
+        <input
+          placeholder="Color"
+          value="${paint.color || ""}"
+          onchange="
+            buildingData.inventory[${index}].color=this.value;
+            saveData();
+          "
+        >
+
+        <input
+          placeholder="Code"
+          value="${paint.code || ""}"
+          onchange="
+            buildingData.inventory[${index}].code=this.value;
+            saveData();
+          "
+        >
+
+        <input
+          placeholder="Kiln Spec"
+          value="${paint.kilnSpec || ""}"
+          onchange="
+            buildingData.inventory[${index}].kilnSpec=this.value;
+            saveData();
+          "
+        >
+
+        <input
+          placeholder="Brand"
+          value="${paint.brand || ""}"
+          onchange="
+            buildingData.inventory[${index}].brand=this.value;
+            saveData();
+          "
+        >
+
+        <input
+          placeholder="Finish"
+          value="${paint.finish || ""}"
+          onchange="
+            buildingData.inventory[${index}].finish=this.value;
+            saveData();
+          "
+        >
+
+        <input
+          placeholder="Quantity"
+          value="${paint.quantity || ""}"
+          onchange="
+            buildingData.inventory[${index}].quantity=this.value;
+            saveData();
+          "
+        >
+
+        <input
+          placeholder="Unit"
+          value="${paint.unit || ""}"
+          onchange="
+            buildingData.inventory[${index}].unit=this.value;
+            saveData();
+          "
+        >
+
+        <input
+          placeholder="Storage Location"
+          value="${paint.location || ""}"
+          onchange="
+            buildingData.inventory[${index}].location=this.value;
+            saveData();
+          "
+        >
+
+        <input
+          placeholder="Vendor"
+          value="${paint.vendor || ""}"
+          onchange="
+            buildingData.inventory[${index}].vendor=this.value;
+            saveData();
+          "
+        >
+
+        <input
+          placeholder="Low Stock Threshold"
+          value="${paint.lowStock || ""}"
+          onchange="
+            buildingData.inventory[${index}].lowStock=this.value;
+            saveData();
+          "
+        >
+
+        <textarea
+          placeholder="Notes"
+          onchange="
+            buildingData.inventory[${index}].notes=this.value;
+            saveData();
+          "
+        >${paint.notes || ""}</textarea>
+
+        <div style="
+          margin-top:10px;
+          font-size:13px;
+          color:#666;
+        ">
+          Used In ${usage} Rooms
+        </div>
+
+        <button
+          style="
+            margin-top:12px;
+            background:#b42318;
+          "
+          onclick="
+            deleteInventoryPaint(${index})
+          "
+        >
+          Delete Inventory Paint
+        </button>
+
+      `;
+
+      paintContainer.appendChild(card);
+
+    }
+  );
+
+}
+
+function deleteInventoryPaint(index){
+
+  if(
+    !confirm(
+      "Delete inventory paint?"
+    )
+  ) return;
+
+  buildingData.inventory.splice(
+    index,
+    1
+  );
+
+  saveData();
+
+  renderInventory();
 
 }
 
@@ -339,273 +670,53 @@ function renderSidebar(room){
 
   paintContainer.innerHTML = "";
 
-  if(!editMode){
+  room.paints.forEach(paint=>{
 
-    room.paints.forEach(paint=>{
-
-      const card =
-        document.createElement("div");
-
-      card.className =
-        "paint-card";
-
-      card.innerHTML = `
-        <div class="paint-surface">
-          ${paint.surface || ""}
-        </div>
-
-        <div class="paint-name">
-          ${paint.color || ""}
-        </div>
-
-        <div class="paint-code">
-          ${paint.code || ""}
-        </div>
-
-        <div style="margin-bottom:12px;">
-          <strong>Kiln Spec:</strong>
-          ${paint.kilnSpec || ""}
-        </div>
-
-        <div class="paint-meta">
-
-          <div>
-            <strong>Finish</strong>
-            <br>
-            ${paint.finish || ""}
-          </div>
-
-          <div>
-            <strong>Brand</strong>
-            <br>
-            ${paint.brand || ""}
-          </div>
-
-        </div>
-      `;
-
-      paintContainer.appendChild(card);
-
-    });
-
-    notesDisplay.textContent =
-      room.notes || "No notes";
-
-  }
-
-  else{
-
-    const library =
-      getPaintLibrary();
-
-    const controls =
+    const card =
       document.createElement("div");
 
-    controls.style.marginBottom =
-      "20px";
+    card.className =
+      "paint-card";
 
-    const dropdown =
-      document.createElement("select");
+    card.innerHTML = `
+      <div class="paint-name">
+        ${paint.color || ""}
+      </div>
 
-    dropdown.style.width = "100%";
-    dropdown.style.marginBottom = "10px";
+      <div class="paint-code">
+        ${paint.code || ""}
+      </div>
 
-    dropdown.innerHTML =
-      `
-      <option value="">
-        Add Existing Paint
-      </option>
-      `;
+      <div>
+        Kiln Spec:
+        ${paint.kilnSpec || ""}
+      </div>
 
-    library.forEach((paint,index)=>{
+      <div class="paint-meta">
 
-      const option =
-        document.createElement("option");
+        <div>
+          ${paint.finish || ""}
+        </div>
 
-      option.value = index;
+        <div>
+          ${paint.brand || ""}
+        </div>
 
-      option.textContent =
-        `${paint.color} — ${paint.brand}`;
+      </div>
+    `;
 
-      dropdown.appendChild(option);
+    paintContainer.appendChild(card);
 
-    });
+  });
 
-    dropdown.onchange = ()=>{
-
-      if(dropdown.value === "")
-        return;
-
-      const paint =
-        structuredClone(
-          library[dropdown.value]
-        );
-
-      room.paints.push(paint);
-
-      renderSidebar(room);
-
-    };
-
-    const addManualBtn =
-      document.createElement("button");
-
-    addManualBtn.textContent =
-      "+ Add New Paint";
-
-    addManualBtn.onclick = ()=>{
-
-      room.paints.push({
-
-        surface:"",
-        color:"",
-        code:"",
-        kilnSpec:"",
-        finish:"",
-        brand:""
-
-      });
-
-      renderSidebar(room);
-
-    };
-
-    const deleteRoomBtn =
-      document.createElement("button");
-
-    deleteRoomBtn.textContent =
-      "Delete Room";
-
-    deleteRoomBtn.style.background =
-      "#b42318";
-
-    deleteRoomBtn.style.marginTop =
-      "10px";
-
-    deleteRoomBtn.onclick =
-      deleteCurrentRoom;
-
-    controls.appendChild(dropdown);
-    controls.appendChild(addManualBtn);
-    controls.appendChild(deleteRoomBtn);
-
-    paintContainer.appendChild(controls);
-
-    room.paints.forEach((paint,index)=>{
-
-      const card =
-        document.createElement("div");
-
-      card.className =
-        "edit-card";
-
-      card.innerHTML = `
-
-        <input
-          placeholder="Surface"
-          data-field="surface"
-          data-index="${index}"
-          value="${paint.surface || ""}"
-        >
-
-        <input
-          placeholder="Color"
-          data-field="color"
-          data-index="${index}"
-          value="${paint.color || ""}"
-        >
-
-        <input
-          placeholder="Code"
-          data-field="code"
-          data-index="${index}"
-          value="${paint.code || ""}"
-        >
-
-        <input
-          placeholder="Kiln Spec Number"
-          data-field="kilnSpec"
-          data-index="${index}"
-          value="${paint.kilnSpec || ""}"
-        >
-
-        <input
-          placeholder="Finish"
-          data-field="finish"
-          data-index="${index}"
-          value="${paint.finish || ""}"
-        >
-
-        <input
-          placeholder="Brand"
-          data-field="brand"
-          data-index="${index}"
-          value="${paint.brand || ""}"
-        >
-
-        <button
-          onclick="deletePaint(${index})"
-          style="
-            background:#b42318;
-            margin-top:8px;
-          "
-        >
-          Delete Paint
-        </button>
-
-      `;
-
-      paintContainer.appendChild(card);
-
-    });
-
-  }
-
-}
-
-function deletePaint(index){
-
-  if(!confirm("Delete paint?"))
-    return;
-
-  const room =
-    getCurrentRoom();
-
-  room.paints.splice(index,1);
-
-  renderSidebar(room);
-
-}
-
-function deleteCurrentRoom(){
-
-  if(!confirm("Delete room?"))
-    return;
-
-  getFloor().rooms =
-    getFloor().rooms.filter(
-      room => room.id !== currentRoom
-    );
-
-  currentRoom = null;
-
-  saveData();
-
-  roomPanel.classList.add(
-    "hidden"
-  );
-
-  emptyState.classList.remove(
-    "hidden"
-  );
-
-  renderFloor();
+  notesDisplay.textContent =
+    room.notes || "No notes";
 
 }
 
 function renderDrawPreview(){
 
-  drawPoints.forEach((point,index)=>{
+  drawPoints.forEach(point=>{
 
     const circle =
       document.createElementNS(
@@ -626,32 +737,6 @@ function renderDrawPreview(){
 
   });
 
-  if(drawPoints.length > 1){
-
-    const line =
-      document.createElementNS(
-        "http://www.w3.org/2000/svg",
-        "polyline"
-      );
-
-    line.setAttribute(
-      "points",
-      drawPoints
-        .map(
-          p => `${p[0]},${p[1]}`
-        )
-        .join(" ")
-    );
-
-    line.setAttribute(
-      "class",
-      "temp-line"
-    );
-
-    overlay.appendChild(line);
-
-  }
-
 }
 
 function startDraw(){
@@ -664,22 +749,6 @@ function startDraw(){
     "hidden"
   );
 
-  drawBtn.classList.add(
-    "hidden"
-  );
-
-  undoBtn.classList.remove(
-    "hidden"
-  );
-
-  finishBtn.classList.remove(
-    "hidden"
-  );
-
-  cancelBtn.classList.remove(
-    "hidden"
-  );
-
 }
 
 function stopDraw(){
@@ -689,22 +758,6 @@ function stopDraw(){
   drawPoints = [];
 
   drawStatus.classList.add(
-    "hidden"
-  );
-
-  drawBtn.classList.remove(
-    "hidden"
-  );
-
-  undoBtn.classList.add(
-    "hidden"
-  );
-
-  finishBtn.classList.add(
-    "hidden"
-  );
-
-  cancelBtn.classList.add(
     "hidden"
   );
 
@@ -751,373 +804,14 @@ function finishDraw(){
 
 }
 
-overlay.addEventListener(
-  "click",
-  (event)=>{
-
-    if(!drawMode) return;
-
-    const rect =
-      overlay.getBoundingClientRect();
-
-    const x =
-      ((event.clientX - rect.left)
-      / rect.width)
-      * MAP_WIDTH;
-
-    const y =
-      ((event.clientY - rect.top)
-      / rect.height)
-      * MAP_HEIGHT;
-
-    drawPoints.push([x,y]);
-
-    renderFloor();
-
-  }
-);
-
-drawBtn.onclick =
-  startDraw;
-
-cancelBtn.onclick =
-  stopDraw;
-
-undoBtn.onclick = ()=>{
-
-  drawPoints.pop();
-
-  renderFloor();
-
-};
-
-finishBtn.onclick =
-  finishDraw;
-
-document.addEventListener(
-  "keydown",
-  (e)=>{
-
-    if(!drawMode) return;
-
-    if(e.key === "Enter"){
-
-      finishDraw();
-
-    }
-
-    if(e.key === "Backspace"){
-
-      drawPoints.pop();
-
-      renderFloor();
-
-    }
-
-  }
-);
-
-floorSelect.onchange = ()=>{
-
-  currentFloor =
-    floorSelect.value;
-
-  currentRoom = null;
-
-  roomPanel.classList.add(
-    "hidden"
-  );
-
-  emptyState.classList.remove(
-    "hidden"
-  );
-
-  renderFloor();
-
-};
-
-searchInput.oninput = ()=>{
-
-  const value =
-    searchInput.value.toLowerCase();
-
-  const room =
-    getFloor().rooms.find(
-      r =>
-      r.id.toLowerCase().includes(value)
-    );
-
-  if(room){
-
-    selectRoom(room.id);
-
-  }
-
-};
-
-editBtn.onclick = ()=>{
-
-  editMode = true;
-
-  editBtn.classList.add(
-    "hidden"
-  );
-
-  saveBtn.classList.remove(
-    "hidden"
-  );
-
-  cancelEditBtn.classList.remove(
-    "hidden"
-  );
-
-  notesDisplay.classList.add(
-    "hidden"
-  );
-
-  notesField.classList.remove(
-    "hidden"
-  );
-
-  const room =
-    getCurrentRoom();
-
-  notesField.value =
-    room.notes || "";
-
-  renderSidebar(room);
-
-  renderFloor();
-
-};
-
-cancelEditBtn.onclick = ()=>{
-
-  editMode = false;
-
-  editBtn.classList.remove(
-    "hidden"
-  );
-
-  saveBtn.classList.add(
-    "hidden"
-  );
-
-  cancelEditBtn.classList.add(
-    "hidden"
-  );
-
-  notesDisplay.classList.remove(
-    "hidden"
-  );
-
-  notesField.classList.add(
-    "hidden"
-  );
-
-  selectRoom(currentRoom);
-
-};
-
-saveBtn.onclick = ()=>{
-
-  const room =
-    getCurrentRoom();
-
-  const inputs =
-    document.querySelectorAll(
-      ".edit-card input"
-    );
-
-  inputs.forEach(input=>{
-
-    const index =
-      input.dataset.index;
-
-    const field =
-      input.dataset.field;
-
-    room.paints[index][field] =
-      input.value;
-
-  });
-
-  room.notes =
-    notesField.value;
-
-  saveData();
-
-  editMode = false;
-
-  editBtn.classList.remove(
-    "hidden"
-  );
-
-  saveBtn.classList.add(
-    "hidden"
-  );
-
-  cancelEditBtn.classList.add(
-    "hidden"
-  );
-
-  notesDisplay.classList.remove(
-    "hidden"
-  );
-
-  notesField.classList.add(
-    "hidden"
-  );
-
-  selectRoom(currentRoom);
-
-};
-
-mapViewport.addEventListener(
-  "wheel",
-  (event)=>{
-
-    event.preventDefault();
-
-    const factor =
-      event.deltaY < 0
-      ? 1.02
-      : 0.98;
-
-    const oldZoom =
-      zoom;
-
-    zoom *= factor;
-
-    zoom =
-      Math.max(
-        0.2,
-        Math.min(zoom,5)
-      );
-
-    const rect =
-      mapViewport.getBoundingClientRect();
-
-    const mouseX =
-      event.clientX - rect.left;
-
-    const mouseY =
-      event.clientY - rect.top;
-
-    panX =
-      mouseX -
-      ((mouseX - panX)
-      * (zoom / oldZoom));
-
-    panY =
-      mouseY -
-      ((mouseY - panY)
-      * (zoom / oldZoom));
-
-    updateTransform();
-
-  },
-  { passive:false }
-);
-
-mapViewport.addEventListener(
-  "mousedown",
-  (e)=>{
-
-    draggingMap = true;
-
-    dragStartX =
-      e.clientX - panX;
-
-    dragStartY =
-      e.clientY - panY;
-
-  }
-);
-
-document.addEventListener(
-  "mousemove",
-  (e)=>{
-
-    if(draggingVertex){
-
-      const rect =
-        overlay.getBoundingClientRect();
-
-      const x =
-        ((e.clientX - rect.left)
-        / rect.width)
-        * MAP_WIDTH;
-
-      const y =
-        ((e.clientY - rect.top)
-        / rect.height)
-        * MAP_HEIGHT;
-
-      const room =
-        draggingVertex.room;
-
-      const points =
-        room.points
-          .split(" ");
-
-      points[draggingVertex.index] =
-        `${x},${y}`;
-
-      room.points =
-        points.join(" ");
-
-      renderFloor();
-
-      return;
-
-    }
-
-    if(!draggingMap) return;
-
-    panX =
-      e.clientX - dragStartX;
-
-    panY =
-      e.clientY - dragStartY;
-
-    updateTransform();
-
-  }
-);
-
-document.addEventListener(
-  "mouseup",
-  ()=>{
-
-    draggingMap = false;
-
-    if(draggingVertex){
-
-      saveData();
-
-    }
-
-    draggingVertex = null;
-
-  }
-);
-
-resetViewBtn.onclick = ()=>{
-
-  centerMap();
-
-};
-
-window.deletePaint =
-  deletePaint;
-
-window.deleteCurrentRoom =
-  deleteCurrentRoom;
+window.deleteInventoryPaint =
+  deleteInventoryPaint;
 
 window.addEventListener(
   "load",
   ()=>{
+
+    ensureInventoryButton();
 
     centerMap();
 
