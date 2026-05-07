@@ -42,7 +42,6 @@ const defaultData = {
   }
 
 };
-
 let buildingData =
   JSON.parse(
     localStorage.getItem("paintMapData")
