@@ -355,9 +355,6 @@ document.getElementById(
 
   renderInventory();
 
-  openInventoryModal(
-    newPaint
-  );
 
 };
 inventorySearch.oninput =
