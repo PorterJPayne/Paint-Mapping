@@ -1,3 +1,115 @@
+drawBtn.onclick =
+  startDraw;
+
+cancelBtn.onclick =
+  stopDraw;
+
+undoBtn.onclick = ()=>{
+
+  drawPoints.pop();
+
+  renderFloor();
+
+};
+
+finishBtn.onclick =
+  finishDraw;
+
+// DRAW CLICKING
+
+overlay.addEventListener(
+  "click",
+  (event)=>{
+
+    if(!drawMode) return;
+
+    const rect =
+      overlay.getBoundingClientRect();
+
+    const x =
+      ((event.clientX - rect.left)
+      / rect.width)
+      * MAP_WIDTH;
+
+    const y =
+      ((event.clientY - rect.top)
+      / rect.height)
+      * MAP_HEIGHT;
+
+    drawPoints.push([x,y]);
+
+    renderFloor();
+
+  }
+);
+
+// KEYBOARD SHORTCUTS
+
+document.addEventListener(
+  "keydown",
+  (e)=>{
+
+    if(!drawMode) return;
+
+    if(e.key === "Enter"){
+
+      finishDraw();
+
+    }
+
+    if(e.key === "Backspace"){
+
+      drawPoints.pop();
+
+      renderFloor();
+
+    }
+
+  }
+);
+
+// FLOOR SWITCHING
+
+floorSelect.onchange = ()=>{
+
+  currentFloor =
+    floorSelect.value;
+
+  currentRoom = null;
+
+  roomPanel.classList.add(
+    "hidden"
+  );
+
+  emptyState.classList.remove(
+    "hidden"
+  );
+
+  renderFloor();
+
+};
+
+// SEARCH
+
+searchInput.oninput = ()=>{
+
+  const value =
+    searchInput.value.toLowerCase();
+
+  const room =
+    getFloor().rooms.find(
+      r =>
+      r.id.toLowerCase().includes(value)
+    );
+
+  if(room){
+
+    selectRoom(room.id);
+
+  }
+
+};
+
 // ZOOM
 
 mapViewport.addEventListener(
@@ -139,3 +251,16 @@ resetViewBtn.onclick = ()=>{
   centerMap();
 
 };
+
+// STARTUP
+
+window.addEventListener(
+  "load",
+  ()=>{
+
+    centerMap();
+
+    renderFloor();
+
+  }
+);
