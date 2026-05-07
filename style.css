@@ -513,3 +513,87 @@ select{
   box-sizing:border-box;
 
 }
+
+.room-swatch{
+
+  height:26px;
+
+  border-radius:10px;
+
+  margin-bottom:18px;
+
+}
+
+.paint-kiln{
+
+  margin-top:10px;
+
+  margin-bottom:14px;
+
+  padding:10px;
+
+  border-radius:10px;
+
+  background:#f4f4f5;
+
+  font-weight:600;
+
+}
+
+.paint-stock{
+
+  margin-top:18px;
+
+  margin-bottom:16px;
+
+}
+
+.in-stock-text{
+
+  color:#15803d;
+
+  font-weight:700;
+
+  margin-bottom:4px;
+
+}
+
+.low-stock-text{
+
+  color:#b91c1c;
+
+  font-weight:700;
+
+  margin-bottom:4px;
+
+}
+
+.paint-quantity{
+
+  font-size:18px;
+
+  font-weight:700;
+
+}
+
+.paint-location{
+
+  margin-top:12px;
+
+  margin-bottom:18px;
+
+  line-height:1.5;
+
+}
+
+.inventory-link-btn{
+
+  width:100%;
+
+}
+
+.low-stock-card{
+
+  border:2px solid #dc2626;
+
+}
