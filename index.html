@@ -51,6 +51,40 @@ body{
   height:calc(100vh - 70px);
 }
 
+.room-list{
+  width:260px;
+  background:white;
+  border-right:1px solid #ddd;
+  overflow-y:auto;
+  padding:16px;
+}
+
+.room-list h3{
+  margin-top:0;
+}
+
+.room-list-item{
+  padding:10px 12px;
+  border-radius:8px;
+  cursor:pointer;
+  margin-bottom:6px;
+  border:1px solid transparent;
+}
+
+.room-list-item:hover{
+  background:#f2f2f2;
+}
+
+.room-list-item.active{
+  background:#e9f3ff;
+  border-color:#7db7ff;
+}
+
+.layout-main{
+  flex:1;
+  display:flex;
+}
+
 .map-section{
   flex:7;
   overflow:auto;
@@ -137,6 +171,12 @@ button.secondary{
 
 button.danger{
   background:#b42318;
+}
+
+button.small-danger{
+  background:#b42318;
+  padding:6px 10px;
+  font-size:12px;
 }
 
 .hidden{
@@ -266,7 +306,7 @@ textarea{
 }
 
 .search-input{
-  width:240px;
+  width:260px;
   padding:10px 12px;
   border:1px solid #ccc;
   border-radius:8px;
@@ -276,6 +316,7 @@ textarea{
   font-size:13px;
   color:#1d7a34;
   font-weight:bold;
+  width:60px;
 }
 
 </style>
@@ -306,9 +347,21 @@ textarea{
     <div
       id="saveIndicator"
       class="save-indicator"
+    ></div>
+
+    <button id="exportBtn">
+      Export
+    </button>
+
+    <button id="importBtn">
+      Import
+    </button>
+
+    <input
+      type="file"
+      id="importFile"
+      hidden
     >
-      Saved
-    </div>
 
     <button id="drawBtn">
       Draw Room
@@ -357,149 +410,163 @@ textarea{
 
 <div class="layout">
 
-  <section class="map-section">
+  <aside class="room-list">
 
-    <div class="map-container">
+    <h3>
+      Rooms
+    </h3>
 
-      <div
-        id="drawStatus"
-        class="draw-status hidden"
-      >
-
-        Drawing Room...
-
-        <br><br>
-
-        ENTER = Finish
-
-        <br>
-
-        ESC = Cancel
-
-        <br>
-
-        BACKSPACE = Undo
-
-      </div>
-
-      <img
-        id="floorImage"
-        src="1st-floor.png"
-      >
-
-      <svg
-        id="overlay"
-        viewBox="0 0 2000 743"
-        preserveAspectRatio="xMidYMid meet"
-      ></svg>
-
-    </div>
-
-  </section>
-
-  <aside class="sidebar">
-
-    <div id="emptyState">
-
-      <h2>
-        Select a room
-      </h2>
-
-      <div class="instructions">
-
-        Click a room polygon
-        to view paint info.
-
-        <br><br>
-
-        Use Draw Room to
-        create new rooms.
-
-      </div>
-
-    </div>
-
-    <div
-      id="roomPanel"
-      class="hidden"
-    >
-
-      <div class="room-header">
-
-        <h1
-          id="roomTitle"
-          class="room-title"
-        ></h1>
-
-        <div
-          id="floorLabel"
-          class="floor-label"
-        ></div>
-
-        <div class="edit-buttons">
-
-          <button id="editBtn">
-            Edit
-          </button>
-
-          <button
-            id="saveBtn"
-            class="hidden"
-          >
-            Save
-          </button>
-
-          <button
-            id="cancelEditBtn"
-            class="hidden secondary"
-          >
-            Cancel
-          </button>
-
-          <button
-            id="deleteRoomBtn"
-            class="danger"
-          >
-            Delete Room
-          </button>
-
-        </div>
-
-      </div>
-
-      <div id="paintContainer"></div>
-
-      <button
-        id="addPaintBtn"
-        class="hidden"
-      >
-        + Add Paint
-      </button>
-
-      <div class="notes-section">
-
-        <h3>
-          Notes
-        </h3>
-
-        <div
-          id="notesDisplay"
-          class="notes-text"
-        >
-          No notes
-        </div>
-
-        <textarea
-          id="notesField"
-          rows="5"
-          class="hidden"
-        ></textarea>
-
-      </div>
-
-    </div>
+    <div id="roomList"></div>
 
   </aside>
+
+  <div class="layout-main">
+
+    <section class="map-section">
+
+      <div class="map-container">
+
+        <div
+          id="drawStatus"
+          class="draw-status hidden"
+        >
+
+          Drawing Room...
+
+          <br><br>
+
+          ENTER = Finish
+
+          <br>
+
+          ESC = Cancel
+
+          <br>
+
+          BACKSPACE = Undo
+
+        </div>
+
+        <img
+          id="floorImage"
+          src="1st-floor.png"
+        >
+
+        <svg
+          id="overlay"
+          viewBox="0 0 2000 743"
+          preserveAspectRatio="xMidYMid meet"
+        ></svg>
+
+      </div>
+
+    </section>
+
+    <aside class="sidebar">
+
+      <div id="emptyState">
+
+        <h2>
+          Select a room
+        </h2>
+
+        <div class="instructions">
+
+          Click a room polygon
+          to view paint info.
+
+          <br><br>
+
+          Use Draw Room to
+          create new rooms.
+
+        </div>
+
+      </div>
+
+      <div
+        id="roomPanel"
+        class="hidden"
+      >
+
+        <div class="room-header">
+
+          <h1
+            id="roomTitle"
+            class="room-title"
+          ></h1>
+
+          <div
+            id="floorLabel"
+            class="floor-label"
+          ></div>
+
+          <div class="edit-buttons">
+
+            <button id="editBtn">
+              Edit
+            </button>
+
+            <button
+              id="saveBtn"
+              class="hidden"
+            >
+              Save
+            </button>
+
+            <button
+              id="cancelEditBtn"
+              class="hidden secondary"
+            >
+              Cancel
+            </button>
+
+            <button
+              id="deleteRoomBtn"
+              class="hidden small-danger"
+            >
+              Delete Room
+            </button>
+
+          </div>
+
+        </div>
+
+        <div id="paintContainer"></div>
+
+        <button
+          id="addPaintBtn"
+          class="hidden"
+        >
+          + Add Paint
+        </button>
+
+        <div class="notes-section">
+
+          <h3>
+            Notes
+          </h3>
+
+          <div
+            id="notesDisplay"
+            class="notes-text"
+          >
+            No notes
+          </div>
+
+          <textarea
+            id="notesField"
+            rows="5"
+            class="hidden"
+          ></textarea>
+
+        </div>
+
+      </div>
+
+    </aside>
+
+  </div>
 
 </div>
 
@@ -568,15 +635,25 @@ const addPaintBtn =
 const searchInput =
   document.getElementById("searchInput");
 
+const roomList =
+  document.getElementById("roomList");
+
 const saveIndicator =
   document.getElementById("saveIndicator");
 
-let currentFloor = "1st-floor";
+const exportBtn =
+  document.getElementById("exportBtn");
 
+const importBtn =
+  document.getElementById("importBtn");
+
+const importFile =
+  document.getElementById("importFile");
+
+let currentFloor = "1st-floor";
 let currentRoom = null;
 
 let editMode = false;
-
 let drawMode = false;
 
 let drawPoints = [];
@@ -584,6 +661,8 @@ let drawPoints = [];
 let lastSelectedRoom = {};
 
 const defaultBuildingData = {
+
+  buildingName:"My Building",
 
   floors: {
 
@@ -674,6 +753,49 @@ function getCurrentRoom(){
 
 }
 
+function renderRoomList(){
+
+  roomList.innerHTML = "";
+
+  const rooms =
+    [...getCurrentFloorData().rooms];
+
+  rooms.sort((a,b)=>
+    a.id.localeCompare(b.id)
+  );
+
+  rooms.forEach(room=>{
+
+    const item =
+      document.createElement("div");
+
+    item.className =
+      "room-list-item";
+
+    if(room.id === currentRoom){
+
+      item.classList.add("active");
+
+    }
+
+    item.textContent =
+      room.id;
+
+    item.addEventListener(
+      "click",
+      ()=>{
+
+        selectRoom(room.id);
+
+      }
+    );
+
+    roomList.appendChild(item);
+
+  });
+
+}
+
 function renderFloor(){
 
   overlay.innerHTML = "";
@@ -730,6 +852,8 @@ function renderFloor(){
   }
 
   highlightSelectedRoom();
+
+  renderRoomList();
 
 }
 
@@ -788,6 +912,8 @@ function selectRoom(roomId){
 
   highlightSelectedRoom();
 
+  renderRoomList();
+
 }
 
 function renderRoomData(){
@@ -797,6 +923,8 @@ function renderRoomData(){
 
   paintContainer.innerHTML =
     "";
+
+  if(!room) return;
 
   if(!editMode){
 
@@ -1235,6 +1363,91 @@ function renderDrawPreview(){
 
 }
 
+function exportData(){
+
+  const dataStr =
+    JSON.stringify(
+      buildingData,
+      null,
+      2
+    );
+
+  const blob =
+    new Blob(
+      [dataStr],
+      {
+        type:"application/json"
+      }
+    );
+
+  const url =
+    URL.createObjectURL(blob);
+
+  const a =
+    document.createElement("a");
+
+  a.href = url;
+
+  a.download =
+    "building-data.paintmap";
+
+  a.click();
+
+  URL.revokeObjectURL(url);
+
+}
+
+function importData(event){
+
+  const file =
+    event.target.files[0];
+
+  if(!file) return;
+
+  const reader =
+    new FileReader();
+
+  reader.onload = (e)=>{
+
+    try{
+
+      buildingData =
+        JSON.parse(e.target.result);
+
+      saveData();
+
+      currentRoom = null;
+
+      renderFloor();
+
+      roomPanel.classList.add(
+        "hidden"
+      );
+
+      emptyState.classList.remove(
+        "hidden"
+      );
+
+      alert(
+        "Import successful"
+      );
+
+    }
+
+    catch(error){
+
+      alert(
+        "Invalid file"
+      );
+
+    }
+
+  };
+
+  reader.readAsText(file);
+
+}
+
 overlay.addEventListener(
   "click",
   (event)=>{
@@ -1290,6 +1503,25 @@ deleteRoomBtn.addEventListener(
   deleteRoom
 );
 
+exportBtn.addEventListener(
+  "click",
+  exportData
+);
+
+importBtn.addEventListener(
+  "click",
+  ()=>{
+
+    importFile.click();
+
+  }
+);
+
+importFile.addEventListener(
+  "change",
+  importData
+);
+
 floorSelect.addEventListener(
   "change",
   ()=>{
@@ -1304,7 +1536,9 @@ floorSelect.addEventListener(
 
     if(rememberedRoom){
 
-      selectRoom(rememberedRoom);
+      selectRoom(
+        rememberedRoom
+      );
 
     }
 
@@ -1338,6 +1572,10 @@ editBtn.addEventListener(
     );
 
     cancelEditBtn.classList.remove(
+      "hidden"
+    );
+
+    deleteRoomBtn.classList.remove(
       "hidden"
     );
 
@@ -1376,6 +1614,10 @@ cancelEditBtn.addEventListener(
     );
 
     cancelEditBtn.classList.add(
+      "hidden"
+    );
+
+    deleteRoomBtn.classList.add(
       "hidden"
     );
 
@@ -1440,6 +1682,10 @@ saveBtn.addEventListener(
       "hidden"
     );
 
+    deleteRoomBtn.classList.add(
+      "hidden"
+    );
+
     addPaintBtn.classList.add(
       "hidden"
     );
@@ -1487,37 +1733,33 @@ searchInput.addEventListener(
       .toLowerCase()
       .trim();
 
+    const rooms =
+      getCurrentFloorData()
+        .rooms;
+
     if(!value){
 
-      highlightSelectedRoom();
+      renderRoomList();
 
       return;
 
     }
 
-    document
-      .querySelectorAll(".room")
-      .forEach(room=>{
+    const match =
+      rooms.find(
+        room =>
+        room.id
+          .toLowerCase()
+          .includes(value)
+      );
 
-        const roomId =
-          room.dataset.roomId
-          .toLowerCase();
+    if(match){
 
-        if(roomId.includes(value)){
+      selectRoom(match.id);
 
-          room.style.fill =
-            "rgba(255,165,0,0.45)";
+    }
 
-        }
-
-        else{
-
-          room.style.fill =
-            "rgba(0,150,255,0.08)";
-
-        }
-
-      });
+    renderRoomList();
 
   }
 );
