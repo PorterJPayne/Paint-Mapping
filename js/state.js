@@ -30,6 +30,8 @@ let draggingVertex = null;
 
 const defaultData = {
 
+  inventory:[],
+
   floors:{
 
     "1st-floor":{
@@ -55,3 +57,11 @@ let buildingData =
   JSON.parse(
     localStorage.getItem("paintMapData")
   ) || defaultData;
+
+// MIGRATION
+
+if(!buildingData.inventory){
+
+  buildingData.inventory = [];
+
+}
