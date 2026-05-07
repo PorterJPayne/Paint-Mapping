@@ -3,10 +3,6 @@ const inventoryPanel =
     "inventoryPanel"
   );
 
-const inventoryBtn =
-  document.getElementById(
-    "inventoryBtn"
-  );
 
 const closeInventoryBtn =
   document.getElementById(
