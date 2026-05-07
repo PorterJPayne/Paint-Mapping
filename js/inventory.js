@@ -3,7 +3,6 @@ const inventoryPanel =
     "inventoryPanel"
   );
 
-
 const closeInventoryBtn =
   document.getElementById(
     "closeInventoryBtn"
@@ -64,19 +63,19 @@ function renderInventory(){
     buildingData.inventory.filter(
       item =>
 
-        item.color
+        (item.color || "")
           .toLowerCase()
           .includes(search)
 
         ||
 
-        item.code
+        (item.code || "")
           .toLowerCase()
           .includes(search)
 
         ||
 
-        item.brand
+        (item.brand || "")
           .toLowerCase()
           .includes(search)
     );
