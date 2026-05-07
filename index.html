@@ -37,7 +37,6 @@ body{
 .topbar-left{
   display:flex;
   align-items:center;
-  gap:12px;
 }
 
 .topbar-right{
@@ -90,7 +89,6 @@ body{
   stroke-width:2;
   vector-effect:non-scaling-stroke;
   cursor:pointer;
-  transition:0.15s;
 }
 
 .room:hover{
@@ -117,7 +115,6 @@ body{
   fill:red;
   font-size:18px;
   font-weight:bold;
-  user-select:none;
 }
 
 button{
@@ -141,28 +138,8 @@ button.danger{
   background:#b42318;
 }
 
-.paint-card{
-  border:1px solid #ddd;
-  border-radius:8px;
-  padding:14px;
-  margin-bottom:16px;
-  background:#fafafa;
-}
-
-.paint-card input,
-textarea{
-  width:100%;
-  padding:8px;
-  margin-top:4px;
-  margin-bottom:12px;
-}
-
 .hidden{
   display:none;
-}
-
-.room-title{
-  margin-top:0;
 }
 
 .draw-status{
@@ -174,13 +151,115 @@ textarea{
   padding:10px 14px;
   border-radius:8px;
   font-size:14px;
-  z-index:10;
 }
 
 .instructions{
   font-size:14px;
   color:#666;
   line-height:1.5;
+}
+
+.room-header{
+  position:sticky;
+  top:-20px;
+  background:white;
+  padding-bottom:14px;
+  margin-bottom:18px;
+  border-bottom:1px solid #ddd;
+}
+
+.room-title{
+  margin:0;
+  font-size:32px;
+}
+
+.floor-label{
+  color:#666;
+  margin-top:6px;
+  font-size:14px;
+}
+
+.paint-display-card{
+  border:1px solid #ddd;
+  border-radius:12px;
+  padding:18px;
+  margin-bottom:16px;
+  background:#fafafa;
+}
+
+.paint-surface{
+  font-size:13px;
+  color:#666;
+  margin-bottom:10px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+}
+
+.paint-name{
+  font-size:26px;
+  font-weight:bold;
+  margin-bottom:8px;
+}
+
+.paint-code{
+  font-size:18px;
+  color:#444;
+  margin-bottom:16px;
+}
+
+.paint-meta-row{
+  display:flex;
+  gap:20px;
+}
+
+.paint-meta{
+  flex:1;
+}
+
+.meta-label{
+  font-size:11px;
+  color:#777;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  margin-bottom:4px;
+}
+
+.meta-value{
+  font-size:16px;
+}
+
+.notes-section{
+  margin-top:20px;
+}
+
+.notes-text{
+  background:#fafafa;
+  border:1px solid #ddd;
+  border-radius:10px;
+  padding:14px;
+  line-height:1.5;
+}
+
+.edit-card{
+  border:1px solid #ddd;
+  border-radius:10px;
+  padding:16px;
+  margin-bottom:16px;
+  background:#fafafa;
+}
+
+.edit-card input,
+textarea{
+  width:100%;
+  padding:10px;
+  margin-top:4px;
+  margin-bottom:14px;
+}
+
+.edit-buttons{
+  display:flex;
+  gap:10px;
+  margin-top:12px;
 }
 
 </style>
@@ -304,23 +383,43 @@ textarea{
       class="hidden"
     >
 
-      <h2
-        id="roomTitle"
-        class="room-title"
-      ></h2>
+      <div class="room-header">
 
-      <button id="editBtn">
-        Edit
-      </button>
+        <h1
+          id="roomTitle"
+          class="room-title"
+        ></h1>
 
-      <button
-        id="saveBtn"
-        class="hidden"
-      >
-        Save
-      </button>
+        <div
+          id="floorLabel"
+          class="floor-label"
+        ></div>
 
-      <br><br>
+        <div
+          class="edit-buttons"
+        >
+
+          <button id="editBtn">
+            Edit
+          </button>
+
+          <button
+            id="saveBtn"
+            class="hidden"
+          >
+            Save
+          </button>
+
+          <button
+            id="cancelEditBtn"
+            class="hidden secondary"
+          >
+            Cancel
+          </button>
+
+        </div>
+
+      </div>
 
       <div id="paintContainer"></div>
 
@@ -331,17 +430,28 @@ textarea{
         + Add Paint
       </button>
 
-      <br><br>
+      <div
+        class="notes-section"
+      >
 
-      <label>
-        Notes
-      </label>
+        <h3>
+          Notes
+        </h3>
 
-      <textarea
-        id="notesField"
-        rows="6"
-        disabled
-      ></textarea>
+        <div
+          id="notesDisplay"
+          class="notes-text"
+        >
+          No notes
+        </div>
+
+        <textarea
+          id="notesField"
+          rows="5"
+          class="hidden"
+        ></textarea>
+
+      </div>
 
     </div>
 
@@ -350,9 +460,6 @@ textarea{
 </div>
 
 <script>
-
-const SVG_WIDTH = 2000;
-const SVG_HEIGHT = 743;
 
 const floorImage =
   document.getElementById("floorImage");
@@ -384,17 +491,26 @@ const emptyState =
 const roomTitle =
   document.getElementById("roomTitle");
 
+const floorLabel =
+  document.getElementById("floorLabel");
+
 const paintContainer =
   document.getElementById("paintContainer");
 
 const notesField =
   document.getElementById("notesField");
 
+const notesDisplay =
+  document.getElementById("notesDisplay");
+
 const editBtn =
   document.getElementById("editBtn");
 
 const saveBtn =
   document.getElementById("saveBtn");
+
+const cancelEditBtn =
+  document.getElementById("cancelEditBtn");
 
 const addPaintBtn =
   document.getElementById("addPaintBtn");
@@ -520,9 +636,6 @@ function renderFloor(){
       "room"
     );
 
-    polygon.dataset.roomId =
-      room.id;
-
     polygon.addEventListener(
       "click",
       (event)=>{
@@ -535,7 +648,7 @@ function renderFloor(){
 
         document
           .querySelectorAll(".room")
-          .forEach(r => {
+          .forEach(r=>{
             r.classList.remove("active");
           });
 
@@ -580,6 +693,11 @@ function selectRoom(roomId){
   roomTitle.textContent =
     room.id;
 
+  floorLabel.textContent =
+    currentFloor
+      .replace("-", " ")
+      .replace("floor", "Floor");
+
   renderRoomData();
 
 }
@@ -592,52 +710,57 @@ function renderRoomData(){
   paintContainer.innerHTML =
     "";
 
-  room.paints.forEach(
-    (paint,index)=>{
+  if(!editMode){
+
+    room.paints.forEach(paint=>{
 
       const card =
         document.createElement("div");
 
       card.className =
-        "paint-card";
+        "paint-display-card";
 
       card.innerHTML = `
 
-        <label>Location</label>
+        <div class="paint-surface">
+          ${paint.surface || ""}
+        </div>
 
-        <input
-          data-field="location"
-          data-index="${index}"
-          value="${paint.location}"
-          ${!editMode ? "disabled" : ""}
-        >
+        <div class="paint-name">
+          ${paint.color || ""}
+        </div>
 
-        <label>Color</label>
+        <div class="paint-code">
+          ${paint.code || ""}
+        </div>
 
-        <input
-          data-field="color"
-          data-index="${index}"
-          value="${paint.color}"
-          ${!editMode ? "disabled" : ""}
-        >
+        <div class="paint-meta-row">
 
-        <label>Brand</label>
+          <div class="paint-meta">
 
-        <input
-          data-field="brand"
-          data-index="${index}"
-          value="${paint.brand}"
-          ${!editMode ? "disabled" : ""}
-        >
+            <div class="meta-label">
+              Finish
+            </div>
 
-        <label>Finish</label>
+            <div class="meta-value">
+              ${paint.finish || ""}
+            </div>
 
-        <input
-          data-field="finish"
-          data-index="${index}"
-          value="${paint.finish}"
-          ${!editMode ? "disabled" : ""}
-        >
+          </div>
+
+          <div class="paint-meta">
+
+            <div class="meta-label">
+              Brand
+            </div>
+
+            <div class="meta-value">
+              ${paint.brand || ""}
+            </div>
+
+          </div>
+
+        </div>
 
       `;
 
@@ -645,14 +768,110 @@ function renderRoomData(){
         card
       );
 
-    }
+    });
+
+    notesDisplay.textContent =
+      room.notes || "No notes";
+
+  }
+
+  else{
+
+    room.paints.forEach(
+      (paint,index)=>{
+
+        const card =
+          document.createElement("div");
+
+        card.className =
+          "edit-card";
+
+        card.innerHTML = `
+
+          <label>
+            Surface
+          </label>
+
+          <input
+            data-field="surface"
+            data-index="${index}"
+            value="${paint.surface || ""}"
+          >
+
+          <label>
+            Color Name
+          </label>
+
+          <input
+            data-field="color"
+            data-index="${index}"
+            value="${paint.color || ""}"
+          >
+
+          <label>
+            Paint Code
+          </label>
+
+          <input
+            data-field="code"
+            data-index="${index}"
+            value="${paint.code || ""}"
+          >
+
+          <label>
+            Finish
+          </label>
+
+          <input
+            data-field="finish"
+            data-index="${index}"
+            value="${paint.finish || ""}"
+          >
+
+          <label>
+            Brand
+          </label>
+
+          <input
+            data-field="brand"
+            data-index="${index}"
+            value="${paint.brand || ""}"
+          >
+
+          <button
+            class="danger"
+            onclick="deletePaint(${index})"
+          >
+            Delete Paint
+          </button>
+
+        `;
+
+        paintContainer.appendChild(
+          card
+        );
+
+      }
+    );
+
+  }
+
+}
+
+function deletePaint(index){
+
+  const confirmed = confirm(
+    "Delete this paint?"
   );
 
-  notesField.value =
-    room.notes;
+  if(!confirmed) return;
 
-  notesField.disabled =
-    !editMode;
+  const room =
+    getCurrentRoom();
+
+  room.paints.splice(index,1);
+
+  renderRoomData();
 
 }
 
@@ -947,7 +1166,57 @@ editBtn.addEventListener(
       "hidden"
     );
 
+    cancelEditBtn.classList.remove(
+      "hidden"
+    );
+
     addPaintBtn.classList.remove(
+      "hidden"
+    );
+
+    notesDisplay.classList.add(
+      "hidden"
+    );
+
+    notesField.classList.remove(
+      "hidden"
+    );
+
+    notesField.value =
+      getCurrentRoom().notes;
+
+    renderRoomData();
+
+  }
+);
+
+cancelEditBtn.addEventListener(
+  "click",
+  ()=>{
+
+    editMode = false;
+
+    editBtn.classList.remove(
+      "hidden"
+    );
+
+    saveBtn.classList.add(
+      "hidden"
+    );
+
+    cancelEditBtn.classList.add(
+      "hidden"
+    );
+
+    addPaintBtn.classList.add(
+      "hidden"
+    );
+
+    notesDisplay.classList.remove(
+      "hidden"
+    );
+
+    notesField.classList.add(
       "hidden"
     );
 
@@ -965,7 +1234,7 @@ saveBtn.addEventListener(
 
     const inputs =
       document.querySelectorAll(
-        ".paint-card input"
+        ".edit-card input"
       );
 
     inputs.forEach(input=>{
@@ -996,7 +1265,19 @@ saveBtn.addEventListener(
       "hidden"
     );
 
+    cancelEditBtn.classList.add(
+      "hidden"
+    );
+
     addPaintBtn.classList.add(
+      "hidden"
+    );
+
+    notesDisplay.classList.remove(
+      "hidden"
+    );
+
+    notesField.classList.add(
       "hidden"
     );
 
@@ -1013,10 +1294,11 @@ addPaintBtn.addEventListener(
       .paints
       .push({
 
-        location:"",
+        surface:"",
         color:"",
-        brand:"",
-        finish:""
+        code:"",
+        finish:"",
+        brand:""
 
       });
 
@@ -1051,4 +1333,5 @@ renderFloor();
 </script>
 
 </body>
+
 </html>
