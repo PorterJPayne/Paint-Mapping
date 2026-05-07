@@ -12,6 +12,8 @@ const lastSelectedRooms = {
 
 };
 
+let currentView = "map";
+
 let drawMode = false;
 let editMode = false;
 
@@ -57,8 +59,6 @@ let buildingData =
   JSON.parse(
     localStorage.getItem("paintMapData")
   ) || defaultData;
-
-// MIGRATION
 
 if(!buildingData.inventory){
 
