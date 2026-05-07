@@ -1,1 +1,269 @@
-//pp
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Paint Map Manager</title>
+
+  <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<header class="topbar">
+
+  <div class="topbar-left">
+
+    <h2>
+      Paint Map Manager
+    </h2>
+
+    <input
+      type="text"
+      id="searchInput"
+      placeholder="Search room..."
+    >
+
+  </div>
+
+  <div class="topbar-right">
+
+    <button id="drawBtn">
+      Draw Room
+    </button>
+
+    <button
+      id="undoBtn"
+      class="hidden"
+    >
+      Undo Point
+    </button>
+
+    <button
+      id="finishBtn"
+      class="hidden"
+    >
+      Finish Room
+    </button>
+
+    <button
+      id="cancelBtn"
+      class="hidden"
+    >
+      Cancel
+    </button>
+
+    <button id="resetViewBtn">
+      Reset View
+    </button>
+
+    <button id="inventoryBtn">
+      Inventory
+    </button>
+
+    <select id="floorSelect">
+
+      <option value="1st-floor">
+        1st Floor
+      </option>
+
+      <option value="2nd-floor">
+        2nd Floor
+      </option>
+
+      <option value="5th-floor">
+        5th Floor
+      </option>
+
+    </select>
+
+  </div>
+
+</header>
+
+<div class="layout">
+
+  <aside class="room-list">
+
+    <h3>
+      Rooms
+    </h3>
+
+    <div id="roomList"></div>
+
+  </aside>
+
+  <section class="map-section">
+
+    <div
+  id="drawStatus"
+  class="draw-status hidden"
+>
+
+  Drawing Mode
+
+  <br><br>
+
+  Click to add points
+
+  <br>
+
+  Enter = Finish
+
+  <br>
+
+  Backspace = Undo
+
+</div>
+
+    <div
+      id="mapViewport"
+      class="map-viewport"
+    >
+
+      <div
+        id="mapTransform"
+        class="map-transform"
+      >
+
+        <div class="map-container">
+
+          <img
+            id="floorImage"
+            src="images/1st-floor.png"
+          >
+
+          <svg
+            id="overlay"
+            viewBox="0 0 2000 743"
+            preserveAspectRatio="none"
+          ></svg>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <aside class="sidebar">
+
+    <div id="emptyState">
+
+      <h2>
+        Select a room
+      </h2>
+
+    </div>
+
+    <div
+      id="roomPanel"
+      class="hidden"
+    >
+
+      <h1 id="roomTitle"></h1>
+
+      <div id="floorLabel"></div>
+
+      <div class="sidebar-buttons">
+
+        <button id="editBtn">
+          Edit
+        </button>
+
+        <button
+          id="saveBtn"
+          class="hidden"
+        >
+          Save
+        </button>
+
+        <button
+          id="cancelEditBtn"
+          class="hidden"
+        >
+          Cancel
+        </button>
+
+      </div>
+
+      <div id="paintContainer"></div>
+
+      <h3>
+        Notes
+      </h3>
+
+      <div
+        id="notesDisplay"
+        class="notes-box"
+      >
+        No notes
+      </div>
+
+      <textarea
+        id="notesField"
+        rows="5"
+        class="hidden"
+      ></textarea>
+
+    </div>
+
+  </aside>
+
+</div>
+
+  <div
+  id="inventoryPanel"
+  class="inventory-panel hidden"
+>
+
+  <div class="inventory-header">
+
+    <h2>
+      Paint Inventory
+    </h2>
+
+    <button id="closeInventoryBtn">
+      Close
+    </button>
+
+  </div>
+
+  <input
+    type="text"
+    id="inventorySearch"
+    placeholder="Search inventory..."
+  >
+
+  <button id="addInventoryBtn">
+    + Add Inventory Paint
+  </button>
+
+  <div id="inventoryList"></div>
+
+</div>
+
+<script src="js/state.js"></script>
+<script src="js/dom.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/map.js"></script>
+<script src="js/draw.js"></script>
+<script src="js/rooms.js"></script>
+<script src="js/sidebar.js"></script>
+<script src="js/zoom.js"></script>
+<script src="js/inventory.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+
+</html>
