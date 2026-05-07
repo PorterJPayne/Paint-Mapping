@@ -35,6 +35,9 @@ function selectRoom(id){
 
   currentRoom = id;
 
+  lastSelectedRooms[currentFloor] =
+    id;
+
   const room =
     getCurrentRoom();
 
