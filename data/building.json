@@ -1,5 +1,20 @@
 {
-  "inventory": [],
+  "inventory": [
+    {
+      "inventoryId": "INV-EHG927",
+      "color": "",
+      "code": "",
+      "kilnSpec": "",
+      "brand": "",
+      "finish": "",
+      "surface": "",
+      "hex": "#cccccc",
+      "quantity": "",
+      "lowStock": "",
+      "location": "",
+      "notes": ""
+    }
+  ],
   "floors": {
     "1st-floor": {
       "image": "images/1st-floor.png",
