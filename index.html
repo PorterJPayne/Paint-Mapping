@@ -8,6 +8,10 @@
 
 <style>
 
+*{
+  box-sizing:border-box;
+}
+
 body{
   margin:0;
   font-family:Arial,sans-serif;
@@ -31,8 +35,8 @@ body{
 
 .map-section{
   flex:7;
-  padding:16px;
   overflow:auto;
+  padding:16px;
 }
 
 .sidebar{
@@ -40,6 +44,7 @@ body{
   background:white;
   border-left:1px solid #ddd;
   padding:20px;
+  overflow-y:auto;
 }
 
 .map-container{
@@ -60,15 +65,16 @@ body{
 }
 
 .room{
-  fill:rgba(0,150,255,0);
-  stroke:rgba(0,150,255,0);
+  fill:rgba(0,150,255,0.08);
+  stroke:rgba(0,150,255,0.4);
   stroke-width:2;
+  vector-effect:non-scaling-stroke;
   cursor:pointer;
 }
 
 .room:hover{
   fill:rgba(0,150,255,0.25);
-  stroke:rgba(0,150,255,0.9);
+  stroke:rgba(0,150,255,1);
 }
 
 .room.active{
@@ -76,15 +82,34 @@ body{
   stroke:rgba(0,150,255,1);
 }
 
-.hidden{
-  display:none;
+.draw-point{
+  fill:red;
+}
+
+.temp-line{
+  stroke:red;
+  stroke-width:2;
+}
+
+button{
+  padding:10px 14px;
+  border:none;
+  background:#222;
+  color:white;
+  border-radius:6px;
+  cursor:pointer;
+  margin-right:8px;
+}
+
+button:hover{
+  opacity:0.9;
 }
 
 .paint-card{
   border:1px solid #ddd;
   border-radius:8px;
   padding:14px;
-  margin-bottom:14px;
+  margin-bottom:16px;
 }
 
 .paint-card input,
@@ -95,17 +120,8 @@ textarea{
   margin-bottom:12px;
 }
 
-button{
-  padding:10px 14px;
-  border:none;
-  background:#222;
-  color:white;
-  cursor:pointer;
-  border-radius:6px;
-}
-
-button:hover{
-  opacity:0.9;
+.hidden{
+  display:none;
 }
 
 </style>
@@ -117,11 +133,19 @@ button:hover{
 
   <h2>Paint Map Manager</h2>
 
-  <select id="floorSelect">
-    <option value="1st-floor.png">1st Floor</option>
-    <option value="2nd-floor.png">2nd Floor</option>
-    <option value="5th-floor.png">5th Floor</option>
-  </select>
+  <div>
+
+    <button id="drawBtn">Draw Room</button>
+    <button id="finishBtn" class="hidden">Finish Room</button>
+    <button id="cancelBtn" class="hidden">Cancel</button>
+
+    <select id="floorSelect">
+      <option value="1st-floor">1st Floor</option>
+      <option value="2nd-floor">2nd Floor</option>
+      <option value="5th-floor">5th Floor</option>
+    </select>
+
+  </div>
 
 </header>
 
@@ -133,34 +157,14 @@ button:hover{
 
       <img
         id="floorImage"
-        src="./1st-floor.png"
+        src="1st-floor.png"
       >
 
       <svg
         id="overlay"
         viewBox="0 0 2000 743"
         preserveAspectRatio="xMidYMid meet"
-      >
-
-        <polygon
-          class="room"
-          id="Snowbird"
-          points="1505,525 1607,525 1607,586 1505,586"
-        ></polygon>
-
-        <polygon
-          class="room"
-          id="Sahara"
-          points="1505,485 1634,485 1634,525 1505,525"
-        ></polygon>
-
-        <polygon
-          class="room"
-          id="SilverLake"
-          points="1514,293 1634,293 1634,394 1514,394"
-        ></polygon>
-
-      </svg>
+      ></svg>
 
     </div>
 
@@ -205,13 +209,18 @@ button:hover{
 
 <script>
 
-const floorSelect = document.getElementById("floorSelect");
 const floorImage = document.getElementById("floorImage");
+const floorSelect = document.getElementById("floorSelect");
+const overlay = document.getElementById("overlay");
 
-const emptyState = document.getElementById("emptyState");
+const drawBtn = document.getElementById("drawBtn");
+const finishBtn = document.getElementById("finishBtn");
+const cancelBtn = document.getElementById("cancelBtn");
+
 const roomPanel = document.getElementById("roomPanel");
-const roomTitle = document.getElementById("roomTitle");
+const emptyState = document.getElementById("emptyState");
 
+const roomTitle = document.getElementById("roomTitle");
 const paintContainer = document.getElementById("paintContainer");
 const notesField = document.getElementById("notesField");
 
@@ -219,110 +228,131 @@ const editBtn = document.getElementById("editBtn");
 const saveBtn = document.getElementById("saveBtn");
 const addPaintBtn = document.getElementById("addPaintBtn");
 
-let editMode = false;
+let currentFloor = "1st-floor";
 let currentRoom = null;
+let editMode = false;
 
-const defaultData = {
+let drawMode = false;
+let drawPoints = [];
 
-  Snowbird: {
-    paints: [
-      {
-        location:"Walls",
-        color:"Swiss Coffee",
-        brand:"Sherwin Williams",
-        finish:"Eggshell"
-      }
-    ],
-    notes:""
-  },
+const defaultBuildingData = {
 
-  Sahara: {
-    paints: [
-      {
-        location:"Walls",
-        color:"Agreeable Gray",
-        brand:"Sherwin Williams",
-        finish:"Flat"
-      }
-    ],
-    notes:""
-  },
+  floors: {
 
-  SilverLake: {
-    paints: [
-      {
-        location:"Walls",
-        color:"Pure White",
-        brand:"Benjamin Moore",
-        finish:"Semi-Gloss"
-      }
-    ],
-    notes:""
+    "1st-floor": {
+      image: "1st-floor.png",
+      rooms: []
+    },
+
+    "2nd-floor": {
+      image: "2nd-floor.png",
+      rooms: []
+    },
+
+    "5th-floor": {
+      image: "5th-floor.png",
+      rooms: []
+    }
+
   }
 
 };
 
-function getData(){
+function loadData(){
 
-  const saved = localStorage.getItem("paintMapData");
+  const saved = localStorage.getItem("buildingData");
 
   if(saved){
     return JSON.parse(saved);
   }
 
   localStorage.setItem(
-    "paintMapData",
-    JSON.stringify(defaultData)
+    "buildingData",
+    JSON.stringify(defaultBuildingData)
   );
 
-  return defaultData;
+  return defaultBuildingData;
 }
 
-let appData = getData();
+let buildingData = loadData();
 
-floorSelect.addEventListener("change", ()=>{
+function saveData(){
 
-  floorImage.src = "./" + floorSelect.value;
+  localStorage.setItem(
+    "buildingData",
+    JSON.stringify(buildingData)
+  );
 
-  roomPanel.classList.add("hidden");
-  emptyState.classList.remove("hidden");
+}
 
-  document.querySelectorAll(".room").forEach(room=>{
-    room.classList.remove("active");
-  });
+function renderFloor(){
 
-});
+  overlay.innerHTML = "";
 
-document.querySelectorAll(".room").forEach(room=>{
+  const floor = buildingData.floors[currentFloor];
 
-  room.addEventListener("click", ()=>{
+  floorImage.src = floor.image;
 
-    currentRoom = room.id;
+  floor.rooms.forEach(room=>{
 
-    document.querySelectorAll(".room").forEach(r=>{
-      r.classList.remove("active");
+    const polygon = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "polygon"
+    );
+
+    polygon.setAttribute("points", room.points);
+    polygon.setAttribute("class", "room");
+    polygon.setAttribute("data-room-id", room.id);
+
+    polygon.addEventListener("click", ()=>{
+
+      selectRoom(room.id);
+
+      document.querySelectorAll(".room").forEach(r=>{
+        r.classList.remove("active");
+      });
+
+      polygon.classList.add("active");
+
     });
 
-    room.classList.add("active");
-
-    emptyState.classList.add("hidden");
-    roomPanel.classList.remove("hidden");
-
-    roomTitle.textContent = currentRoom;
-
-    renderRoom();
+    overlay.appendChild(polygon);
 
   });
 
-});
+}
 
-function renderRoom(){
+function selectRoom(roomId){
 
-  const roomData = appData[currentRoom];
+  currentRoom = roomId;
+
+  const room = getCurrentRoom();
+
+  emptyState.classList.add("hidden");
+  roomPanel.classList.remove("hidden");
+
+  roomTitle.textContent = room.id;
+
+  renderRoomData();
+
+}
+
+function getCurrentRoom(){
+
+  return buildingData
+    .floors[currentFloor]
+    .rooms
+    .find(room=>room.id === currentRoom);
+
+}
+
+function renderRoomData(){
+
+  const room = getCurrentRoom();
 
   paintContainer.innerHTML = "";
 
-  roomData.paints.forEach((paint,index)=>{
+  room.paints.forEach((paint,index)=>{
 
     const card = document.createElement("div");
 
@@ -368,10 +398,143 @@ function renderRoom(){
 
   });
 
-  notesField.value = roomData.notes;
+  notesField.value = room.notes;
   notesField.disabled = !editMode;
 
 }
+
+floorSelect.addEventListener("change", ()=>{
+
+  currentFloor = floorSelect.value;
+
+  roomPanel.classList.add("hidden");
+  emptyState.classList.remove("hidden");
+
+  renderFloor();
+
+});
+
+drawBtn.addEventListener("click", ()=>{
+
+  drawMode = true;
+  drawPoints = [];
+
+  drawBtn.classList.add("hidden");
+  finishBtn.classList.remove("hidden");
+  cancelBtn.classList.remove("hidden");
+
+});
+
+cancelBtn.addEventListener("click", ()=>{
+
+  drawMode = false;
+  drawPoints = [];
+
+  renderFloor();
+
+  drawBtn.classList.remove("hidden");
+  finishBtn.classList.add("hidden");
+  cancelBtn.classList.add("hidden");
+
+});
+
+overlay.addEventListener("click", (event)=>{
+
+  if(!drawMode) return;
+
+  const svgRect = overlay.getBoundingClientRect();
+
+  const x = ((event.clientX - svgRect.left) / svgRect.width) * 2000;
+  const y = ((event.clientY - svgRect.top) / svgRect.height) * 743;
+
+  drawPoints.push([x,y]);
+
+  renderFloor();
+  renderDrawPreview();
+
+});
+
+function renderDrawPreview(){
+
+  drawPoints.forEach(point=>{
+
+    const circle = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "circle"
+    );
+
+    circle.setAttribute("cx", point[0]);
+    circle.setAttribute("cy", point[1]);
+    circle.setAttribute("r", 5);
+    circle.setAttribute("class", "draw-point");
+
+    overlay.appendChild(circle);
+
+  });
+
+  if(drawPoints.length > 1){
+
+    const polyline = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "polyline"
+    );
+
+    const pointString = drawPoints
+      .map(p=>`${p[0]},${p[1]}`)
+      .join(" ");
+
+    polyline.setAttribute("points", pointString);
+    polyline.setAttribute("fill", "none");
+    polyline.setAttribute("class", "temp-line");
+
+    overlay.appendChild(polyline);
+
+  }
+
+}
+
+finishBtn.addEventListener("click", ()=>{
+
+  if(drawPoints.length < 3){
+    alert("Need at least 3 points");
+    return;
+  }
+
+  const roomName = prompt("Enter room name");
+
+  if(!roomName) return;
+
+  const room = {
+
+    id: roomName,
+
+    points: drawPoints
+      .map(p=>`${p[0]},${p[1]}`)
+      .join(" "),
+
+    paints: [],
+
+    notes: ""
+
+  };
+
+  buildingData
+    .floors[currentFloor]
+    .rooms
+    .push(room);
+
+  saveData();
+
+  drawMode = false;
+  drawPoints = [];
+
+  drawBtn.classList.remove("hidden");
+  finishBtn.classList.add("hidden");
+  cancelBtn.classList.add("hidden");
+
+  renderFloor();
+
+});
 
 editBtn.addEventListener("click", ()=>{
 
@@ -381,13 +544,13 @@ editBtn.addEventListener("click", ()=>{
   saveBtn.classList.remove("hidden");
   addPaintBtn.classList.remove("hidden");
 
-  renderRoom();
+  renderRoomData();
 
 });
 
 saveBtn.addEventListener("click", ()=>{
 
-  const roomData = appData[currentRoom];
+  const room = getCurrentRoom();
 
   const inputs = document.querySelectorAll(".paint-card input");
 
@@ -396,39 +559,40 @@ saveBtn.addEventListener("click", ()=>{
     const index = input.dataset.index;
     const field = input.dataset.field;
 
-    roomData.paints[index][field] = input.value;
+    room.paints[index][field] = input.value;
 
   });
 
-  roomData.notes = notesField.value;
+  room.notes = notesField.value;
 
-  localStorage.setItem(
-    "paintMapData",
-    JSON.stringify(appData)
-  );
+  saveData();
 
   editMode = false;
 
+  editBtn.classList.remove("hidden");
   saveBtn.classList.add("hidden");
   addPaintBtn.classList.add("hidden");
-  editBtn.classList.remove("hidden");
 
-  renderRoom();
+  renderRoomData();
 
 });
 
 addPaintBtn.addEventListener("click", ()=>{
 
-  appData[currentRoom].paints.push({
+  const room = getCurrentRoom();
+
+  room.paints.push({
     location:"",
     color:"",
     brand:"",
     finish:""
   });
 
-  renderRoom();
+  renderRoomData();
 
 });
+
+renderFloor();
 
 </script>
 
