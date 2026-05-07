@@ -96,6 +96,40 @@ function getFloor(){
 
 }
 
+function getCurrentRoom(){
+
+  return getFloor().rooms.find(
+    r => r.id === currentRoom
+  );
+
+}
+
+function getPaintLibrary(){
+
+  const map = new Map();
+
+  Object.values(buildingData.floors)
+    .forEach(floor=>{
+
+      floor.rooms.forEach(room=>{
+
+        room.paints.forEach(paint=>{
+
+          const key =
+            JSON.stringify(paint);
+
+          map.set(key,paint);
+
+        });
+
+      });
+
+    });
+
+  return [...map.values()];
+
+}
+
 function updateTransform(){
 
   mapTransform.style.transform =
@@ -142,8 +176,7 @@ function renderRoomList(){
     const div =
       document.createElement("div");
 
-    div.className =
-      "room-item";
+    div.className = "room-item";
 
     if(room.id === currentRoom){
 
@@ -151,8 +184,7 @@ function renderRoomList(){
 
     }
 
-    div.textContent =
-      room.id;
+    div.textContent = room.id;
 
     div.onclick = ()=>{
 
@@ -224,9 +256,7 @@ function selectRoom(id){
   currentRoom = id;
 
   const room =
-    getFloor().rooms.find(
-      r => r.id === id
-    );
+    getCurrentRoom();
 
   if(!room) return;
 
@@ -253,8 +283,6 @@ function selectRoom(id){
 function renderSidebar(room){
 
   paintContainer.innerHTML = "";
-
-  // VIEW MODE
 
   if(!editMode){
 
@@ -305,9 +333,87 @@ function renderSidebar(room){
 
   }
 
-  // EDIT MODE
-
   else{
+
+    const library =
+      getPaintLibrary();
+
+    const controls =
+      document.createElement("div");
+
+    controls.style.marginBottom =
+      "20px";
+
+    const dropdown =
+      document.createElement("select");
+
+    dropdown.style.width = "100%";
+    dropdown.style.marginBottom = "10px";
+
+    dropdown.innerHTML =
+      `
+      <option value="">
+        Add Existing Paint
+      </option>
+      `;
+
+    library.forEach((paint,index)=>{
+
+      const option =
+        document.createElement("option");
+
+      option.value = index;
+
+      option.textContent =
+        `${paint.color} — ${paint.brand}`;
+
+      dropdown.appendChild(option);
+
+    });
+
+    dropdown.onchange = ()=>{
+
+      if(dropdown.value === "")
+        return;
+
+      const paint =
+        structuredClone(
+          library[dropdown.value]
+        );
+
+      room.paints.push(paint);
+
+      renderSidebar(room);
+
+    };
+
+    const addManualBtn =
+      document.createElement("button");
+
+    addManualBtn.textContent =
+      "+ Add New Paint";
+
+    addManualBtn.onclick = ()=>{
+
+      room.paints.push({
+
+        surface:"",
+        color:"",
+        code:"",
+        finish:"",
+        brand:""
+
+      });
+
+      renderSidebar(room);
+
+    };
+
+    controls.appendChild(dropdown);
+
+    controls.appendChild(addManualBtn);
+
+    paintContainer.appendChild(controls);
 
     room.paints.forEach((paint,index)=>{
 
@@ -354,6 +460,16 @@ function renderSidebar(room){
           value="${paint.brand || ""}"
         >
 
+        <button
+          onclick="deletePaint(${index})"
+          style="
+            background:#b42318;
+            margin-top:8px;
+          "
+        >
+          Delete Paint
+        </button>
+
       `;
 
       paintContainer.appendChild(card);
@@ -361,6 +477,46 @@ function renderSidebar(room){
     });
 
   }
+
+}
+
+function deletePaint(index){
+
+  if(!confirm("Delete paint?"))
+    return;
+
+  const room =
+    getCurrentRoom();
+
+  room.paints.splice(index,1);
+
+  renderSidebar(room);
+
+}
+
+function deleteCurrentRoom(){
+
+  if(!confirm("Delete room?"))
+    return;
+
+  getFloor().rooms =
+    getFloor().rooms.filter(
+      room => room.id !== currentRoom
+    );
+
+  currentRoom = null;
+
+  saveData();
+
+  roomPanel.classList.add(
+    "hidden"
+  );
+
+  emptyState.classList.remove(
+    "hidden"
+  );
+
+  renderFloor();
 
 }
 
@@ -679,10 +835,6 @@ editBtn.onclick = ()=>{
     "hidden"
   );
 
-  addPaintBtn.classList.remove(
-    "hidden"
-  );
-
   notesDisplay.classList.add(
     "hidden"
   );
@@ -692,11 +844,7 @@ editBtn.onclick = ()=>{
   );
 
   const room =
-    getFloor().rooms.find(
-      r => r.id === currentRoom
-    );
-
-  if(!room) return;
+    getCurrentRoom();
 
   notesField.value =
     room.notes || "";
@@ -721,10 +869,6 @@ cancelEditBtn.onclick = ()=>{
     "hidden"
   );
 
-  addPaintBtn.classList.add(
-    "hidden"
-  );
-
   notesDisplay.classList.remove(
     "hidden"
   );
@@ -740,9 +884,7 @@ cancelEditBtn.onclick = ()=>{
 saveBtn.onclick = ()=>{
 
   const room =
-    getFloor().rooms.find(
-      r => r.id === currentRoom
-    );
+    getCurrentRoom();
 
   const inputs =
     document.querySelectorAll(
@@ -781,10 +923,6 @@ saveBtn.onclick = ()=>{
     "hidden"
   );
 
-  addPaintBtn.classList.add(
-    "hidden"
-  );
-
   notesDisplay.classList.remove(
     "hidden"
   );
@@ -794,81 +932,6 @@ saveBtn.onclick = ()=>{
   );
 
   selectRoom(currentRoom);
-
-};
-
-addPaintBtn.onclick = ()=>{
-
-  const room =
-    getFloor().rooms.find(
-      r => r.id === currentRoom
-    );
-
-  room.paints.push({
-
-    surface:"",
-    color:"",
-    code:"",
-    finish:"",
-    brand:""
-
-  });
-
-  renderSidebar(room);
-
-};
-
-exportBtn.onclick = ()=>{
-
-  const blob =
-    new Blob(
-      [JSON.stringify(buildingData,null,2)],
-      {type:"application/json"}
-    );
-
-  const url =
-    URL.createObjectURL(blob);
-
-  const a =
-    document.createElement("a");
-
-  a.href = url;
-
-  a.download =
-    "paint-map.paintmap";
-
-  a.click();
-
-};
-
-importBtn.onclick = ()=>{
-
-  importFile.click();
-
-};
-
-importFile.onchange = (event)=>{
-
-  const file =
-    event.target.files[0];
-
-  if(!file) return;
-
-  const reader =
-    new FileReader();
-
-  reader.onload = ()=>{
-
-    buildingData =
-      JSON.parse(reader.result);
-
-    saveData();
-
-    renderFloor();
-
-  };
-
-  reader.readAsText(file);
 
 };
 
@@ -965,6 +1028,12 @@ resetViewBtn.onclick = ()=>{
   centerMap();
 
 };
+
+window.deletePaint =
+  deletePaint;
+
+window.deleteCurrentRoom =
+  deleteCurrentRoom;
 
 window.addEventListener(
   "load",
