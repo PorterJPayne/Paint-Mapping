@@ -1,21 +1,11 @@
-const inventoryPanel =
+const inventoryView =
   document.getElementById(
-    "inventoryPanel"
+    "inventoryView"
   );
 
-const closeInventoryBtn =
+const inventoryGrid =
   document.getElementById(
-    "closeInventoryBtn"
-  );
-
-const addInventoryBtn =
-  document.getElementById(
-    "addInventoryBtn"
-  );
-
-const inventoryList =
-  document.getElementById(
-    "inventoryList"
+    "inventoryGrid"
   );
 
 const inventorySearch =
@@ -23,19 +13,21 @@ const inventorySearch =
     "inventorySearch"
   );
 
-function createInventoryId(){
+const addInventoryBtn =
+  document.getElementById(
+    "addInventoryBtn"
+  );
 
-  return "INV-" +
-    Math.random()
-      .toString(36)
-      .substring(2,8)
-      .toUpperCase();
+const backToMapBtn =
+  document.getElementById(
+    "backToMapBtn"
+  );
 
-}
+function openInventoryView(){
 
-function openInventory(){
+  currentView = "inventory";
 
-  inventoryPanel.classList.remove(
+  inventoryView.classList.remove(
     "hidden"
   );
 
@@ -43,17 +35,27 @@ function openInventory(){
 
 }
 
-function closeInventory(){
+function closeInventoryView(){
 
-  inventoryPanel.classList.add(
+  currentView = "map";
+
+  inventoryView.classList.add(
     "hidden"
   );
 
 }
 
+document.getElementById(
+  "inventoryBtn"
+).onclick =
+  openInventoryView;
+
+backToMapBtn.onclick =
+  closeInventoryView;
+
 function renderInventory(){
 
-  inventoryList.innerHTML = "";
+  inventoryGrid.innerHTML = "";
 
   const search =
     inventorySearch.value
@@ -61,26 +63,26 @@ function renderInventory(){
 
   const filtered =
     buildingData.inventory.filter(
-      item =>
+      paint =>
 
-        (item.color || "")
+        (paint.color || "")
           .toLowerCase()
           .includes(search)
 
         ||
 
-        (item.code || "")
+        (paint.code || "")
           .toLowerCase()
           .includes(search)
 
         ||
 
-        (item.brand || "")
+        (paint.brand || "")
           .toLowerCase()
           .includes(search)
     );
 
-  filtered.forEach((paint,index)=>{
+  filtered.forEach(paint=>{
 
     const lowStock =
 
@@ -97,175 +99,261 @@ function renderInventory(){
 
     card.className =
       `
-      inventory-item
-      ${lowStock ? "low-stock" : ""}
+      inventory-card
+      ${lowStock ? "inventory-low" : ""}
       `;
 
     card.innerHTML = `
 
-      <div class="inventory-title">
-        ${paint.color || "Untitled Paint"}
-      </div>
-
-      <div style="
-        font-size:12px;
-        color:#666;
-        margin-bottom:10px;
-      ">
-        ${paint.inventoryId}
-      </div>
-
-      <input
-        placeholder="Color"
-        value="${paint.color || ""}"
-        onchange="
-          buildingData.inventory[${index}].color=this.value;
-          saveData();
-        "
-      >
-
-      <input
-        placeholder="Code"
-        value="${paint.code || ""}"
-        onchange="
-          buildingData.inventory[${index}].code=this.value;
-          saveData();
-        "
-      >
-
-      <input
-        placeholder="Kiln Spec"
-        value="${paint.kilnSpec || ""}"
-        onchange="
-          buildingData.inventory[${index}].kilnSpec=this.value;
-          saveData();
-        "
-      >
-
-      <input
-        placeholder="Brand"
-        value="${paint.brand || ""}"
-        onchange="
-          buildingData.inventory[${index}].brand=this.value;
-          saveData();
-        "
-      >
-
-      <input
-        placeholder="Finish"
-        value="${paint.finish || ""}"
-        onchange="
-          buildingData.inventory[${index}].finish=this.value;
-          saveData();
-        "
-      >
-
-      <input
-        placeholder="Quantity"
-        value="${paint.quantity || ""}"
-        onchange="
-          buildingData.inventory[${index}].quantity=this.value;
-          saveData();
-        "
-      >
-
-      <input
-        placeholder="Low Stock Threshold"
-        value="${paint.lowStock || ""}"
-        onchange="
-          buildingData.inventory[${index}].lowStock=this.value;
-          saveData();
-        "
-      >
-
-      <input
-        placeholder="Storage Location"
-        value="${paint.location || ""}"
-        onchange="
-          buildingData.inventory[${index}].location=this.value;
-          saveData();
-        "
-      >
-
-      <textarea
-        placeholder="Notes"
-        onchange="
-          buildingData.inventory[${index}].notes=this.value;
-          saveData();
-        "
-      >${paint.notes || ""}</textarea>
-
-      <button
-        onclick="deleteInventoryPaint(${index})"
+      <div
+        class="inventory-swatch"
         style="
-          background:#b42318;
+          background:
+            ${paint.hex || "#ddd"};
         "
-      >
-        Delete Paint
-      </button>
+      ></div>
+
+      <div class="inventory-info">
+
+        <div class="inventory-name">
+          ${paint.color || "Untitled"}
+        </div>
+
+        <div class="inventory-code">
+          ${paint.code || ""}
+        </div>
+
+        <div class="inventory-meta">
+
+          ${paint.brand || ""}
+
+          <br>
+
+          ${paint.finish || ""}
+
+          <br><br>
+
+          Used In:
+          ${getPaintUsageCount(
+            paint.inventoryId
+          )} rooms
+
+        </div>
+
+      </div>
 
     `;
 
-    inventoryList.appendChild(card);
+    card.onclick = ()=>{
+
+      openInventoryModal(paint);
+
+    };
+
+    inventoryGrid.appendChild(card);
 
   });
 
 }
 
-function deleteInventoryPaint(index){
+function openInventoryModal(paint){
 
-  if(
-    !confirm(
-      "Delete inventory paint?"
-    )
-  ) return;
+  const modal =
+    document.createElement("div");
 
-  buildingData.inventory.splice(
-    index,
-    1
+  modal.className =
+    "inventory-modal";
+
+  modal.innerHTML = `
+
+    <div class="inventory-modal-content">
+
+      <h2>
+        ${paint.color || ""}
+      </h2>
+
+      <input id="invColor" value="${paint.color || ""}">
+      <input id="invCode" value="${paint.code || ""}">
+      <input id="invKiln" value="${paint.kilnSpec || ""}">
+      <input id="invBrand" value="${paint.brand || ""}">
+      <input id="invFinish" value="${paint.finish || ""}">
+      <input id="invHex" value="${paint.hex || ""}">
+      <input id="invQuantity" value="${paint.quantity || ""}">
+      <input id="invLocation" value="${paint.location || ""}">
+
+      <textarea id="invNotes">${paint.notes || ""}</textarea>
+
+      <button id="saveInventoryPaint">
+        Save
+      </button>
+
+      <button
+        id="deleteInventoryPaint"
+        style="
+          background:#b42318;
+          margin-top:10px;
+        "
+      >
+        Delete
+      </button>
+
+    </div>
+
+  `;
+
+  document.body.appendChild(modal);
+
+  modal.onclick = (e)=>{
+
+    if(e.target === modal){
+
+      modal.remove();
+
+    }
+
+  };
+
+  document.getElementById(
+    "saveInventoryPaint"
+  ).onclick = ()=>{
+
+    paint.color =
+      document.getElementById(
+        "invColor"
+      ).value;
+
+    paint.code =
+      document.getElementById(
+        "invCode"
+      ).value;
+
+    paint.kilnSpec =
+      document.getElementById(
+        "invKiln"
+      ).value;
+
+    paint.brand =
+      document.getElementById(
+        "invBrand"
+      ).value;
+
+    paint.finish =
+      document.getElementById(
+        "invFinish"
+      ).value;
+
+    paint.hex =
+      document.getElementById(
+        "invHex"
+      ).value;
+
+    paint.quantity =
+      document.getElementById(
+        "invQuantity"
+      ).value;
+
+    paint.location =
+      document.getElementById(
+        "invLocation"
+      ).value;
+
+    paint.notes =
+      document.getElementById(
+        "invNotes"
+      ).value;
+
+    saveData();
+
+    renderInventory();
+
+    modal.remove();
+
+  };
+
+  document.getElementById(
+    "deleteInventoryPaint"
+  ).onclick = ()=>{
+
+    if(
+      !confirm(
+        "Delete inventory paint?"
+      )
+    ) return;
+
+    buildingData.inventory =
+      buildingData.inventory.filter(
+        p =>
+          p.inventoryId !==
+          paint.inventoryId
+      );
+
+    Object.values(
+      buildingData.floors
+    ).forEach(floor=>{
+
+      floor.rooms.forEach(room=>{
+
+        room.paints =
+          room.paints.filter(
+            ref =>
+              ref.inventoryId !==
+              paint.inventoryId
+          );
+
+      });
+
+    });
+
+    saveData();
+
+    renderInventory();
+
+    modal.remove();
+
+  };
+
+}
+
+addInventoryBtn.onclick = ()=>{
+
+  const newPaint = {
+
+    inventoryId:
+      createInventoryId(),
+
+    color:"",
+
+    code:"",
+
+    kilnSpec:"",
+
+    brand:"",
+
+    finish:"",
+
+    hex:"#cccccc",
+
+    quantity:"",
+
+    location:"",
+
+    notes:""
+
+  };
+
+  buildingData.inventory.push(
+    newPaint
   );
 
   saveData();
 
   renderInventory();
 
-}
-
-document.getElementById(
-  "inventoryBtn"
-).onclick =
-  openInventory;
-
-closeInventoryBtn.onclick =
-  closeInventory;
-
-addInventoryBtn.onclick = ()=>{
-
-  buildingData.inventory.push({
-
-    inventoryId:
-      createInventoryId(),
-
-    color:"",
-    code:"",
-    kilnSpec:"",
-    brand:"",
-    finish:"",
-    quantity:"",
-    lowStock:"",
-    location:"",
-    notes:""
-
-  });
-
-  saveData();
-
-  renderInventory();
+  openInventoryModal(
+    newPaint
+  );
 
 };
 
 inventorySearch.oninput =
   renderInventory;
-
-window.deleteInventoryPaint =
-  deleteInventoryPaint;
