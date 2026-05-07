@@ -2,17 +2,17 @@
   "inventory": [
     {
       "inventoryId": "INV-EHG927",
-      "color": "",
-      "code": "",
-      "kilnSpec": "",
-      "brand": "",
-      "finish": "",
-      "surface": "",
+      "color": "White",
+      "code": "asdf",
+      "kilnSpec": "KP001",
+      "brand": "SW",
+      "finish": "gloss",
+      "surface": "wall",
       "hex": "#cccccc",
-      "quantity": "",
-      "lowStock": "",
-      "location": "",
-      "notes": ""
+      "quantity": "5",
+      "lowStock": "1",
+      "location": "Lehi 1 Storage",
+      "notes": "Gross"
     }
   ],
   "floors": {
