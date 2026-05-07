@@ -83,6 +83,20 @@
       "lowStock": "0",
       "location": "Lehi 1 Storage",
       "notes": ""
+    },
+    {
+      "inventoryId": "INV-3YP9FL",
+      "color": "",
+      "code": "",
+      "kilnSpec": "",
+      "brand": "",
+      "finish": "",
+      "surface": "",
+      "hex": "#cccccc",
+      "quantity": "",
+      "lowStock": "",
+      "location": "",
+      "notes": ""
     }
   ],
   "floors": {
