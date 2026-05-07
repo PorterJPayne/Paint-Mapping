@@ -75,17 +75,30 @@ floorSelect.onchange = ()=>{
   currentFloor =
     floorSelect.value;
 
-  currentRoom = null;
-
-  roomPanel.classList.add(
-    "hidden"
-  );
-
-  emptyState.classList.remove(
-    "hidden"
-  );
-
   renderFloor();
+
+  const rememberedRoom =
+    lastSelectedRooms[currentFloor];
+
+  if(rememberedRoom){
+
+    selectRoom(rememberedRoom);
+
+  }
+
+  else{
+
+    currentRoom = null;
+
+    roomPanel.classList.add(
+      "hidden"
+    );
+
+    emptyState.classList.remove(
+      "hidden"
+    );
+
+  }
 
 };
 
