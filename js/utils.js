@@ -12,28 +12,49 @@ function getCurrentRoom(){
 
 }
 
-function getPaintLibrary(){
+function getInventoryPaint(id){
 
-  const map = new Map();
+  return buildingData.inventory.find(
+    paint =>
+      paint.inventoryId === id
+  );
 
-  Object.values(buildingData.floors)
-    .forEach(floor=>{
+}
 
-      floor.rooms.forEach(room=>{
+function createInventoryId(){
 
-        room.paints.forEach(paint=>{
+  return "INV-" +
+    Math.random()
+      .toString(36)
+      .substring(2,8)
+      .toUpperCase();
 
-          const key =
-            JSON.stringify(paint);
+}
 
-          map.set(key,paint);
+function getPaintUsageCount(id){
 
-        });
+  let count = 0;
+
+  Object.values(
+    buildingData.floors
+  ).forEach(floor=>{
+
+    floor.rooms.forEach(room=>{
+
+      room.paints.forEach(ref=>{
+
+        if(ref.inventoryId === id){
+
+          count++;
+
+        }
 
       });
 
     });
 
-  return [...map.values()];
+  });
+
+  return count;
 
 }
