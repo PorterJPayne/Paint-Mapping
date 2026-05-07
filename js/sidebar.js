@@ -11,27 +11,34 @@ function renderSidebar(room){
 
     if(!paint) return;
 
+    const lowStock =
+
+      Number(paint.quantity || 0)
+
+      <=
+
+      Number(
+        paint.lowStock || 0
+      );
+
     const card =
       document.createElement("div");
 
     card.className =
-      "paint-card";
+      `
+      paint-card
+      ${lowStock ? "low-stock-card" : ""}
+      `;
 
     card.innerHTML = `
 
       <div
+        class="room-swatch"
         style="
-          height:18px;
-          border-radius:8px;
-          margin-bottom:14px;
           background:
             ${paint.hex || "#ddd"};
         "
       ></div>
-
-      <div class="paint-surface">
-        ${paint.surface || ""}
-      </div>
 
       <div class="paint-name">
         ${paint.color || ""}
@@ -41,10 +48,15 @@ function renderSidebar(room){
         ${paint.code || ""}
       </div>
 
-      <div style="margin-bottom:12px;">
-        <strong>Kiln Spec:</strong>
-        ${paint.kilnSpec || ""}
-      </div>
+      ${paint.kilnSpec
+        ? `
+        <div class="paint-kiln">
+          Kiln Spec:
+          ${paint.kilnSpec}
+        </div>
+        `
+        : ""
+      }
 
       <div class="paint-meta">
 
@@ -61,6 +73,49 @@ function renderSidebar(room){
         </div>
 
       </div>
+
+      <div class="paint-stock">
+
+        ${
+          lowStock
+          ? `
+            <div class="low-stock-text">
+              LOW STOCK
+            </div>
+          `
+          : `
+            <div class="in-stock-text">
+              IN STOCK
+            </div>
+          `
+        }
+
+        <div class="paint-quantity">
+          ${paint.quantity || "0"} gallons
+        </div>
+
+      </div>
+
+      <div class="paint-location">
+
+        <strong>Storage:</strong>
+
+        <br>
+
+        ${paint.location || "Unknown"}
+
+      </div>
+
+      <button
+        class="inventory-link-btn"
+        onclick="
+          openInventoryFromRoom(
+            '${paint.inventoryId}'
+          )
+        "
+      >
+        Open Inventory Paint
+      </button>
 
     `;
 
@@ -179,7 +234,7 @@ saveBtn.onclick = ()=>{
 
 };
 
-// INVENTORY PAINT PICKER
+// EDIT ROOM PAINTS
 
 function renderPaintSelection(room){
 
@@ -196,8 +251,6 @@ function renderPaintSelection(room){
 
   wrapper.style.gap =
     "12px";
-
-  // ADD INVENTORY PAINT
 
   const select =
     document.createElement("select");
@@ -253,8 +306,6 @@ function renderPaintSelection(room){
 
   wrapper.appendChild(select);
 
-  // ROOM PAINTS
-
   room.paints.forEach(
     (ref,index)=>{
 
@@ -274,10 +325,8 @@ function renderPaintSelection(room){
       card.innerHTML = `
 
         <div
+          class="room-swatch"
           style="
-            height:18px;
-            border-radius:8px;
-            margin-bottom:14px;
             background:
               ${paint.hex || "#ddd"};
           "
@@ -326,8 +375,6 @@ function renderPaintSelection(room){
 
     }
   );
-
-  // DELETE ROOM
 
   const deleteBtn =
     document.createElement("button");
