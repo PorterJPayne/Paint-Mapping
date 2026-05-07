@@ -62,58 +62,82 @@ function renderSidebar(room){
 
   else{
 
-    const library =
-      getPaintLibrary();
-
     const controls =
       document.createElement("div");
 
     controls.style.marginBottom =
       "20px";
 
-    // EXISTING PAINT DROPDOWN
+    // INVENTORY DROPDOWN
 
-    const dropdown =
+    const inventoryDropdown =
       document.createElement("select");
 
-    dropdown.style.width = "100%";
+    inventoryDropdown.style.width =
+      "100%";
 
-    dropdown.style.marginBottom =
+    inventoryDropdown.style.marginBottom =
       "10px";
 
-    dropdown.innerHTML =
+    inventoryDropdown.innerHTML =
       `
       <option value="">
-        Add Existing Paint
+        Add Paint From Inventory
       </option>
       `;
 
-    library.forEach((paint,index)=>{
+    buildingData.inventory.forEach(
+      (paint,index)=>{
 
-      const option =
-        document.createElement("option");
+        const option =
+          document.createElement(
+            "option"
+          );
 
-      option.value =
-        index;
+        option.value = index;
 
-      option.textContent =
-        `${paint.color} — ${paint.brand}`;
+        option.textContent =
+          `
+          ${paint.color || "Untitled"}
+          — 
+          ${paint.brand || ""}
+          `
+          .replace(/\s+/g," ")
+          .trim();
 
-      dropdown.appendChild(option);
-
-    });
-
-    dropdown.onchange = ()=>{
-
-      if(dropdown.value === "")
-        return;
-
-      const paint =
-        structuredClone(
-          library[dropdown.value]
+        inventoryDropdown.appendChild(
+          option
         );
 
-      room.paints.push(paint);
+      }
+    );
+
+    inventoryDropdown.onchange = ()=>{
+
+      if(
+        inventoryDropdown.value === ""
+      ) return;
+
+      const inventoryPaint =
+        structuredClone(
+          buildingData.inventory[
+            inventoryDropdown.value
+          ]
+        );
+
+      delete inventoryPaint.inventoryId;
+
+      delete inventoryPaint.quantity;
+
+      delete inventoryPaint.lowStock;
+
+      delete inventoryPaint.location;
+
+      delete inventoryPaint.notes;
+
+      room.paints.push(
+        inventoryPaint
+      );
 
       renderSidebar(room);
 
@@ -161,13 +185,21 @@ function renderSidebar(room){
     deleteRoomBtn.onclick =
       deleteCurrentRoom;
 
-    controls.appendChild(dropdown);
+    controls.appendChild(
+      inventoryDropdown
+    );
 
-    controls.appendChild(addManualBtn);
+    controls.appendChild(
+      addManualBtn
+    );
 
-    controls.appendChild(deleteRoomBtn);
+    controls.appendChild(
+      deleteRoomBtn
+    );
 
-    paintContainer.appendChild(controls);
+    paintContainer.appendChild(
+      controls
+    );
 
     // EDIT CARDS
 
