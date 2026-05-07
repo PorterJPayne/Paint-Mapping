@@ -2,320 +2,74 @@ function renderSidebar(room){
 
   paintContainer.innerHTML = "";
 
-  // VIEW MODE
+  room.paints.forEach(ref=>{
 
-  if(!editMode){
-
-    room.paints.forEach(paint=>{
-
-      const card =
-        document.createElement("div");
-
-      card.className =
-        "paint-card";
-
-      card.innerHTML = `
-        <div class="paint-surface">
-          ${paint.surface || ""}
-        </div>
-
-        <div class="paint-name">
-          ${paint.color || ""}
-        </div>
-
-        <div class="paint-code">
-          ${paint.code || ""}
-        </div>
-
-        <div style="margin-bottom:12px;">
-          <strong>Kiln Spec:</strong>
-          ${paint.kilnSpec || ""}
-        </div>
-
-        <div class="paint-meta">
-
-          <div>
-            <strong>Finish</strong>
-            <br>
-            ${paint.finish || ""}
-          </div>
-
-          <div>
-            <strong>Brand</strong>
-            <br>
-            ${paint.brand || ""}
-          </div>
-
-        </div>
-      `;
-
-      paintContainer.appendChild(card);
-
-    });
-
-    notesDisplay.textContent =
-      room.notes || "No notes";
-
-  }
-
-  // EDIT MODE
-
-  else{
-
-    const controls =
-      document.createElement("div");
-
-    controls.style.marginBottom =
-      "20px";
-
-    // INVENTORY DROPDOWN
-
-    const inventoryDropdown =
-      document.createElement("select");
-
-    inventoryDropdown.style.width =
-      "100%";
-
-    inventoryDropdown.style.marginBottom =
-      "10px";
-
-    inventoryDropdown.innerHTML =
-      `
-      <option value="">
-        Add Paint From Inventory
-      </option>
-      `;
-
-    buildingData.inventory.forEach(
-      (paint,index)=>{
-
-        const option =
-          document.createElement(
-            "option"
-          );
-
-        option.value = index;
-
-        option.textContent =
-          `
-          ${paint.color || "Untitled"}
-          — 
-          ${paint.brand || ""}
-          `
-          .replace(/\s+/g," ")
-          .trim();
-
-        inventoryDropdown.appendChild(
-          option
-        );
-
-      }
-    );
-
-    inventoryDropdown.onchange = ()=>{
-
-      if(
-        inventoryDropdown.value === ""
-      ) return;
-
-      const inventoryPaint =
-        structuredClone(
-          buildingData.inventory[
-            inventoryDropdown.value
-          ]
-        );
-
-      delete inventoryPaint.inventoryId;
-
-      delete inventoryPaint.quantity;
-
-      delete inventoryPaint.lowStock;
-
-      delete inventoryPaint.location;
-
-      delete inventoryPaint.notes;
-
-      room.paints.push(
-        inventoryPaint
+    const paint =
+      getInventoryPaint(
+        ref.inventoryId
       );
 
-      renderSidebar(room);
+    if(!paint) return;
 
-    };
+    const card =
+      document.createElement("div");
 
-    // ADD NEW PAINT
+    card.className =
+      "paint-card";
 
-    const addManualBtn =
-      document.createElement("button");
+    card.innerHTML = `
 
-    addManualBtn.textContent =
-      "+ Add New Paint";
+      <div
+        style="
+          height:18px;
+          border-radius:8px;
+          margin-bottom:14px;
+          background:
+            ${paint.hex || "#ddd"};
+        "
+      ></div>
 
-    addManualBtn.onclick = ()=>{
+      <div class="paint-surface">
+        ${paint.surface || ""}
+      </div>
 
-      room.paints.push({
+      <div class="paint-name">
+        ${paint.color || ""}
+      </div>
 
-        surface:"",
-        color:"",
-        code:"",
-        kilnSpec:"",
-        finish:"",
-        brand:""
+      <div class="paint-code">
+        ${paint.code || ""}
+      </div>
 
-      });
+      <div style="margin-bottom:12px;">
+        <strong>Kiln Spec:</strong>
+        ${paint.kilnSpec || ""}
+      </div>
 
-      renderSidebar(room);
+      <div class="paint-meta">
 
-    };
+        <div>
+          <strong>Finish</strong>
+          <br>
+          ${paint.finish || ""}
+        </div>
 
-    // DELETE ROOM
+        <div>
+          <strong>Brand</strong>
+          <br>
+          ${paint.brand || ""}
+        </div>
 
-    const deleteRoomBtn =
-      document.createElement("button");
+      </div>
 
-    deleteRoomBtn.textContent =
-      "Delete Room";
+    `;
 
-    deleteRoomBtn.style.background =
-      "#b42318";
+    paintContainer.appendChild(card);
 
-    deleteRoomBtn.style.marginTop =
-      "10px";
+  });
 
-    deleteRoomBtn.onclick =
-      deleteCurrentRoom;
-
-    controls.appendChild(
-      inventoryDropdown
-    );
-
-    controls.appendChild(
-      addManualBtn
-    );
-
-    controls.appendChild(
-      deleteRoomBtn
-    );
-
-    paintContainer.appendChild(
-      controls
-    );
-
-    // EDIT CARDS
-
-    room.paints.forEach((paint,index)=>{
-
-      const card =
-        document.createElement("div");
-
-      card.className =
-        "edit-card";
-
-      card.innerHTML = `
-
-        <input
-          placeholder="Surface"
-          data-field="surface"
-          data-index="${index}"
-          value="${paint.surface || ""}"
-        >
-
-        <input
-          placeholder="Color"
-          data-field="color"
-          data-index="${index}"
-          value="${paint.color || ""}"
-        >
-
-        <input
-          placeholder="Code"
-          data-field="code"
-          data-index="${index}"
-          value="${paint.code || ""}"
-        >
-
-        <input
-          placeholder="Kiln Spec Number"
-          data-field="kilnSpec"
-          data-index="${index}"
-          value="${paint.kilnSpec || ""}"
-        >
-
-        <input
-          placeholder="Finish"
-          data-field="finish"
-          data-index="${index}"
-          value="${paint.finish || ""}"
-        >
-
-        <input
-          placeholder="Brand"
-          data-field="brand"
-          data-index="${index}"
-          value="${paint.brand || ""}"
-        >
-
-        <button
-          onclick="deletePaint(${index})"
-          style="
-            background:#b42318;
-            margin-top:8px;
-          "
-        >
-          Delete Paint
-        </button>
-
-      `;
-
-      paintContainer.appendChild(card);
-
-    });
-
-  }
-
-}
-
-// DELETE PAINT
-
-function deletePaint(index){
-
-  if(!confirm("Delete paint?"))
-    return;
-
-  const room =
-    getCurrentRoom();
-
-  room.paints.splice(index,1);
-
-  renderSidebar(room);
-
-}
-
-// DELETE ROOM
-
-function deleteCurrentRoom(){
-
-  if(!confirm("Delete room?"))
-    return;
-
-  getFloor().rooms =
-    getFloor().rooms.filter(
-      room => room.id !== currentRoom
-    );
-
-  currentRoom = null;
-
-  saveData();
-
-  roomPanel.classList.add(
-    "hidden"
-  );
-
-  emptyState.classList.remove(
-    "hidden"
-  );
-
-  renderFloor();
+  notesDisplay.textContent =
+    room.notes || "No notes";
 
 }
 
@@ -351,7 +105,7 @@ editBtn.onclick = ()=>{
   notesField.value =
     room.notes || "";
 
-  renderSidebar(room);
+  renderPaintSelection(room);
 
   renderFloor();
 
@@ -394,24 +148,6 @@ saveBtn.onclick = ()=>{
   const room =
     getCurrentRoom();
 
-  const inputs =
-    document.querySelectorAll(
-      ".edit-card input"
-    );
-
-  inputs.forEach(input=>{
-
-    const index =
-      input.dataset.index;
-
-    const field =
-      input.dataset.field;
-
-    room.paints[index][field] =
-      input.value;
-
-  });
-
   room.notes =
     notesField.value;
 
@@ -443,10 +179,235 @@ saveBtn.onclick = ()=>{
 
 };
 
+// INVENTORY PAINT PICKER
+
+function renderPaintSelection(room){
+
+  paintContainer.innerHTML = "";
+
+  const wrapper =
+    document.createElement("div");
+
+  wrapper.style.display =
+    "flex";
+
+  wrapper.style.flexDirection =
+    "column";
+
+  wrapper.style.gap =
+    "12px";
+
+  // ADD INVENTORY PAINT
+
+  const select =
+    document.createElement("select");
+
+  select.innerHTML =
+    `
+    <option value="">
+      Add Paint From Inventory
+    </option>
+    `;
+
+  buildingData.inventory.forEach(
+    paint=>{
+
+      const option =
+        document.createElement(
+          "option"
+        );
+
+      option.value =
+        paint.inventoryId;
+
+      option.textContent =
+        `
+        ${paint.color || "Untitled"}
+        —
+        ${paint.code || ""}
+        `
+        .replace(/\s+/g," ")
+        .trim();
+
+      select.appendChild(option);
+
+    }
+  );
+
+  select.onchange = ()=>{
+
+    if(!select.value) return;
+
+    room.paints.push({
+
+      inventoryId:
+        select.value
+
+    });
+
+    saveData();
+
+    renderPaintSelection(room);
+
+  };
+
+  wrapper.appendChild(select);
+
+  // ROOM PAINTS
+
+  room.paints.forEach(
+    (ref,index)=>{
+
+      const paint =
+        getInventoryPaint(
+          ref.inventoryId
+        );
+
+      if(!paint) return;
+
+      const card =
+        document.createElement("div");
+
+      card.className =
+        "paint-card";
+
+      card.innerHTML = `
+
+        <div
+          style="
+            height:18px;
+            border-radius:8px;
+            margin-bottom:14px;
+            background:
+              ${paint.hex || "#ddd"};
+          "
+        ></div>
+
+        <div class="paint-name">
+          ${paint.color || ""}
+        </div>
+
+        <div class="paint-code">
+          ${paint.code || ""}
+        </div>
+
+        <div style="
+          margin-top:12px;
+          display:flex;
+          gap:8px;
+        ">
+
+          <button
+            onclick="
+              openInventoryFromRoom(
+                '${paint.inventoryId}'
+              )
+            "
+          >
+            Edit Inventory Paint
+          </button>
+
+          <button
+            onclick="
+              removeRoomPaint(${index})
+            "
+            style="
+              background:#b42318;
+            "
+          >
+            Remove
+          </button>
+
+        </div>
+
+      `;
+
+      wrapper.appendChild(card);
+
+    }
+  );
+
+  // DELETE ROOM
+
+  const deleteBtn =
+    document.createElement("button");
+
+  deleteBtn.textContent =
+    "Delete Room";
+
+  deleteBtn.style.background =
+    "#b42318";
+
+  deleteBtn.onclick =
+    deleteCurrentRoom;
+
+  wrapper.appendChild(deleteBtn);
+
+  paintContainer.appendChild(
+    wrapper
+  );
+
+}
+
+function removeRoomPaint(index){
+
+  const room =
+    getCurrentRoom();
+
+  room.paints.splice(index,1);
+
+  saveData();
+
+  renderPaintSelection(room);
+
+}
+
+function deleteCurrentRoom(){
+
+  if(!confirm("Delete room?"))
+    return;
+
+  getFloor().rooms =
+    getFloor().rooms.filter(
+      room => room.id !== currentRoom
+    );
+
+  currentRoom = null;
+
+  saveData();
+
+  roomPanel.classList.add(
+    "hidden"
+  );
+
+  emptyState.classList.remove(
+    "hidden"
+  );
+
+  renderFloor();
+
+}
+
+function openInventoryFromRoom(id){
+
+  openInventoryView();
+
+  const paint =
+    getInventoryPaint(id);
+
+  if(!paint) return;
+
+  openInventoryModal(paint);
+
+}
+
 // GLOBALS
 
-window.deletePaint =
-  deletePaint;
+window.removeRoomPaint =
+  removeRoomPaint;
 
 window.deleteCurrentRoom =
   deleteCurrentRoom;
+
+window.openInventoryFromRoom =
+  openInventoryFromRoom;
