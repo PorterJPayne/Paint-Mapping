@@ -206,3 +206,43 @@ select{
   border-radius:8px;
   z-index:100;
 }
+
+.vertex{
+
+  fill:#f97316;
+
+  stroke:white;
+
+  stroke-width:2;
+
+  cursor:grab;
+
+}
+
+.vertex:active{
+
+  cursor:grabbing;
+
+}
+
+.temp-line{
+
+  fill:none;
+
+  stroke:#f97316;
+
+  stroke-width:3;
+
+  stroke-dasharray:8 6;
+
+}
+
+.draw-point{
+
+  fill:#f97316;
+
+  stroke:white;
+
+  stroke-width:2;
+
+}
