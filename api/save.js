@@ -23,10 +23,10 @@ export default async function handler(
       );
 
     const owner =
-      "YOUR_GITHUB_USERNAME";
+      "PorterJPayne";
 
     const repo =
-      "YOUR_REPO_NAME";
+      "Paint-Mapping";
 
     const path =
       "data/building.json";
