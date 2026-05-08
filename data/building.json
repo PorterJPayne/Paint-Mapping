@@ -102,37 +102,7 @@
   "floors": {
     "1st-floor": {
       "image": "images/1st-floor.png",
-      "rooms": [
-        {
-          "id": "994085a4-74cd-4ef5-9a2c-d2cc2075e0d2",
-          "name": "ijhgjhg",
-          "points": [
-            {
-              "x": 1491.96675900277,
-              "y": 138.81300506125064
-            },
-            {
-              "x": 1445.4293628808866,
-              "y": 305.0179772928658
-            },
-            {
-              "x": 1168.421052631579,
-              "y": 256.264518771592
-            },
-            {
-              "x": 1270.360110803324,
-              "y": 134.38087246840757
-            }
-          ],
-          "paints": [
-            {
-              "inventoryId": "INV-I9TE8Y"
-            }
-          ],
-          "primaryPaintId": "INV-I9TE8Y",
-          "notes": ""
-        }
-      ]
+      "rooms": []
     },
     "2nd-floor": {
       "image": "images/2nd-floor.png",
@@ -299,6 +269,9 @@
           "paints": [
             {
               "inventoryId": "INV-3YP9FL"
+            },
+            {
+              "inventoryId": "INV-0TYN8V"
             }
           ],
           "primaryPaintId": "INV-3YP9FL",
