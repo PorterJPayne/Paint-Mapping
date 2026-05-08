@@ -3,7 +3,7 @@ function renderRoomList(){
   roomList.innerHTML = "";
 
   const rooms =
-    getFloor().rooms || [];
+    getFloor().rooms;
 
   const search =
     (
@@ -38,34 +38,11 @@ function renderRoomList(){
 
       item.onclick = ()=>{
 
-        // EXIT EDIT MODE
-        // WHEN SWITCHING ROOMS
-
         if(
           currentRoom !== room.id
         ){
 
           editMode = false;
-
-          editBtn.classList.remove(
-            "hidden"
-          );
-
-          saveBtn.classList.add(
-            "hidden"
-          );
-
-          cancelEditBtn.classList.add(
-            "hidden"
-          );
-
-          notesDisplay.classList.remove(
-            "hidden"
-          );
-
-          notesField.classList.add(
-            "hidden"
-          );
 
         }
 
@@ -76,61 +53,6 @@ function renderRoomList(){
       roomList.appendChild(item);
 
     });
-
-}
-
-function normalizeRoomPoints(room){
-
-  // OLD STRING FORMAT
-
-  if(
-    typeof room.points ===
-    "string"
-  ){
-
-    room.points =
-      room.points
-        .split(" ")
-        .map(pair=>{
-
-          const [x,y] =
-            pair.split(",");
-
-          return {
-
-            x:Number(x),
-
-            y:Number(y)
-
-          };
-
-        });
-
-    saveData();
-
-  }
-
-  // SAFETY
-
-  if(
-    !Array.isArray(room.points)
-  ){
-
-    room.points = [];
-
-  }
-
-  // FILTER INVALID
-
-  room.points =
-    room.points.filter(
-      p =>
-        p &&
-        typeof p.x === "number" &&
-        typeof p.y === "number" &&
-        !Number.isNaN(p.x) &&
-        !Number.isNaN(p.y)
-    );
 
 }
 
@@ -147,8 +69,6 @@ function selectRoom(id){
 
   if(!room) return;
 
-  normalizeRoomPoints(room);
-
   emptyState.classList.add(
     "hidden"
   );
@@ -158,7 +78,7 @@ function selectRoom(id){
   );
 
   roomTitle.textContent =
-    room.name;
+    room.name || "Unnamed";
 
   floorLabel.textContent =
     currentFloor
@@ -178,13 +98,13 @@ function renderFloor(){
   overlay.innerHTML = "";
 
   const rooms =
-    getFloor().rooms || [];
+    getFloor().rooms;
 
   rooms.forEach(room=>{
 
-    normalizeRoomPoints(room);
-
-    if(!room.points.length){
+    if(
+      !Array.isArray(room.points)
+    ){
 
       return;
 
@@ -235,45 +155,10 @@ function renderFloor(){
         : "2"
     );
 
-    polygon.setAttribute(
-      "stroke-opacity",
-      room.id === currentRoom
-        ? "1"
-        : "0.65"
-    );
-
     polygon.style.cursor =
       "pointer";
 
     polygon.onclick = ()=>{
-
-      if(
-        currentRoom !== room.id
-      ){
-
-        editMode = false;
-
-        editBtn.classList.remove(
-          "hidden"
-        );
-
-        saveBtn.classList.add(
-          "hidden"
-        );
-
-        cancelEditBtn.classList.add(
-          "hidden"
-        );
-
-        notesDisplay.classList.remove(
-          "hidden"
-        );
-
-        notesField.classList.add(
-          "hidden"
-        );
-
-      }
 
       selectRoom(room.id);
 
@@ -282,8 +167,6 @@ function renderFloor(){
     overlay.appendChild(
       polygon
     );
-
-    // DRAGGABLE VERTICES
 
     if(
       editMode
@@ -322,7 +205,7 @@ function renderFloor(){
 
           vertex.setAttribute(
             "stroke",
-            "#ffffff"
+            "#fff"
           );
 
           vertex.setAttribute(
@@ -359,17 +242,7 @@ function renderFloor(){
 
   });
 
-  // DRAWING LINES
-
   if(drawPoints.length){
-
-    const safeDrawPoints =
-      drawPoints.filter(
-        p =>
-          p &&
-          typeof p.x === "number" &&
-          typeof p.y === "number"
-      );
 
     const polyline =
       document.createElementNS(
@@ -381,7 +254,7 @@ function renderFloor(){
 
       "points",
 
-      safeDrawPoints
+      drawPoints
         .map(
           p=>`${p.x},${p.y}`
         )
@@ -408,7 +281,7 @@ function renderFloor(){
       polyline
     );
 
-    safeDrawPoints.forEach(point=>{
+    drawPoints.forEach(point=>{
 
       const circle =
         document.createElementNS(
@@ -446,79 +319,7 @@ function renderFloor(){
 
 }
 
-function createRoom(name){
-
-  const safeDrawPoints =
-    drawPoints.filter(
-      p =>
-        p &&
-        typeof p.x === "number" &&
-        typeof p.y === "number"
-    );
-
-  const room = {
-
-    id:
-      crypto.randomUUID(),
-
-    name,
-
-    notes:"",
-
-    paints:[],
-
-    primaryPaintId:null,
-
-    points:safeDrawPoints
-
-  };
-
-  getFloor().rooms.push(room);
-
-  saveData();
-
-  drawPoints = [];
-
-  drawMode = false;
-
-  drawBtn.classList.remove(
-    "active"
-  );
-
-  undoBtn.classList.add(
-    "hidden"
-  );
-
-  finishBtn.classList.add(
-    "hidden"
-  );
-
-  cancelBtn.classList.add(
-    "hidden"
-  );
-
-  drawStatus.classList.add(
-    "hidden"
-  );
-
-  renderRoomList();
-
-  renderFloor();
-
-  selectRoom(room.id);
-
-}
-
 function getRoomFill(room){
-
-  if(
-    typeof showRoomColors ===
-    "undefined"
-  ){
-
-    return "rgba(59,130,246,0.15)";
-
-  }
 
   if(!showRoomColors){
 
