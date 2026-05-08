@@ -111,7 +111,8 @@
               "inventoryId": "INV-EHG927"
             }
           ],
-          "notes": ""
+          "notes": "",
+          "primaryPaintId": "INV-EHG927"
         },
         {
           "id": "Arches Conference Room",
@@ -119,9 +120,13 @@
           "paints": [
             {
               "inventoryId": "INV-I9TE8Y"
+            },
+            {
+              "inventoryId": "INV-UTDR9F"
             }
           ],
-          "notes": "Color not confirmed."
+          "notes": "Color not confirmed.",
+          "primaryPaintId": "INV-I9TE8Y"
         },
         {
           "id": "Sahara Meeting Room",
@@ -137,7 +142,8 @@
               "inventoryId": "INV-0TYN8V"
             }
           ],
-          "notes": ""
+          "notes": "",
+          "primaryPaintId": "INV-0TYN8V"
         },
         {
           "id": "PS 15",
@@ -153,7 +159,8 @@
               "inventoryId": "INV-4YN9FP"
             }
           ],
-          "notes": ""
+          "notes": "",
+          "primaryPaintId": "INV-4YN9FP"
         }
       ]
     },
