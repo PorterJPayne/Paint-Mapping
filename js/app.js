@@ -36,7 +36,10 @@ overlay.addEventListener(
       / rect.height)
       * MAP_HEIGHT;
 
-    drawPoints.push([x,y]);
+    drawPoints.push({
+      x,
+      y
+    });
 
     renderFloor();
 
@@ -59,6 +62,8 @@ document.addEventListener(
 
     if(e.key === "Backspace"){
 
+      e.preventDefault();
+
       drawPoints.pop();
 
       renderFloor();
@@ -74,6 +79,11 @@ floorSelect.onchange = ()=>{
 
   currentFloor =
     floorSelect.value;
+
+  floorImage.src =
+    `images/${currentFloor}.png`;
+
+  renderRoomList();
 
   renderFloor();
 
@@ -106,20 +116,7 @@ floorSelect.onchange = ()=>{
 
 searchInput.oninput = ()=>{
 
-  const value =
-    searchInput.value.toLowerCase();
-
-  const room =
-    getFloor().rooms.find(
-      r =>
-      r.id.toLowerCase().includes(value)
-    );
-
-  if(room){
-
-    selectRoom(room.id);
-
-  }
+  renderRoomList();
 
 };
 
@@ -172,11 +169,13 @@ mapViewport.addEventListener(
   { passive:false }
 );
 
-// PAN + VERTEX DRAGGING
+// PAN
 
 mapViewport.addEventListener(
   "mousedown",
   (e)=>{
+
+    if(draggingVertex) return;
 
     draggingMap = true;
 
@@ -189,9 +188,13 @@ mapViewport.addEventListener(
   }
 );
 
+// DRAGGING
+
 document.addEventListener(
   "mousemove",
   (e)=>{
+
+    // VERTEX DRAGGING
 
     if(draggingVertex){
 
@@ -209,24 +212,28 @@ document.addEventListener(
         * MAP_HEIGHT;
 
       const room =
-        draggingVertex.room;
+        getFloor().rooms.find(
+          r =>
+            r.id ===
+            draggingVertex.roomId
+        );
 
-      const points =
-        room.points
-          .split(" ");
+      if(!room) return;
 
-      points[
+      room.points[
         draggingVertex.index
-      ] = `${x},${y}`;
-
-      room.points =
-        points.join(" ");
+      ] = {
+        x,
+        y
+      };
 
       renderFloor();
 
       return;
 
     }
+
+    // MAP PANNING
 
     if(!draggingMap) return;
 
@@ -240,6 +247,8 @@ document.addEventListener(
 
   }
 );
+
+// MOUSE UP
 
 document.addEventListener(
   "mouseup",
@@ -268,10 +277,6 @@ resetViewBtn.onclick = ()=>{
 
 // STARTUP
 
-// STARTUP
-
-// STARTUP
-
 window.addEventListener(
   "load",
   async ()=>{
@@ -284,12 +289,14 @@ window.addEventListener(
 
     catch(error){
 
-      console.error(
-        "Cloud load failed",
-        error
-      );
+      console.error(error);
 
     }
+
+    floorImage.src =
+      `images/${currentFloor}.png`;
+
+    renderRoomList();
 
     centerMap();
 
