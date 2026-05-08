@@ -93,6 +93,33 @@ function renderFloor(){
 
   rooms.forEach(room=>{
 
+    if(
+      !Array.isArray(room.points)
+    ){
+
+      console.error(
+        "Invalid room points",
+        room
+      );
+
+      return;
+
+    }
+
+    const safePoints =
+      room.points.filter(
+        p =>
+          p &&
+          typeof p.x === "number" &&
+          typeof p.y === "number"
+      );
+
+    if(!safePoints.length){
+
+      return;
+
+    }
+
     const polygon =
       document.createElementNS(
         "http://www.w3.org/2000/svg",
@@ -103,14 +130,12 @@ function renderFloor(){
 
       "points",
 
-     (Array.isArray(room.points)
-  ? room.points
-  : []
-)
-.map(
-  p=>`${p.x},${p.y}`
-)
-.join(" ")
+      safePoints
+        .map(
+          p=>`${p.x},${p.y}`
+        )
+        .join(" ")
+
     );
 
     polygon.setAttribute(
@@ -153,7 +178,7 @@ function renderFloor(){
       room.id === currentRoom
     ){
 
-      room.points.forEach(
+      safePoints.forEach(
         (point,index)=>{
 
           const vertex =
@@ -215,6 +240,14 @@ function renderFloor(){
 
   if(drawPoints.length){
 
+    const safeDrawPoints =
+      drawPoints.filter(
+        p =>
+          p &&
+          typeof p.x === "number" &&
+          typeof p.y === "number"
+      );
+
     const polyline =
       document.createElementNS(
         "http://www.w3.org/2000/svg",
@@ -225,7 +258,7 @@ function renderFloor(){
 
       "points",
 
-      drawPoints
+      safeDrawPoints
         .map(
           p=>`${p.x},${p.y}`
         )
@@ -252,7 +285,7 @@ function renderFloor(){
       polyline
     );
 
-    drawPoints.forEach(point=>{
+    safeDrawPoints.forEach(point=>{
 
       const circle =
         document.createElementNS(
@@ -292,6 +325,14 @@ function renderFloor(){
 
 function createRoom(name){
 
+  const safeDrawPoints =
+    drawPoints.filter(
+      p =>
+        p &&
+        typeof p.x === "number" &&
+        typeof p.y === "number"
+    );
+
   const room = {
 
     id:
@@ -305,7 +346,7 @@ function createRoom(name){
 
     primaryPaintId:null,
 
-    points:[...drawPoints]
+    points:safeDrawPoints
 
   };
 
@@ -347,6 +388,15 @@ function createRoom(name){
 
 function getRoomFill(room){
 
+  if(
+    typeof showRoomColors ===
+    "undefined"
+  ){
+
+    return "rgba(59,130,246,0.15)";
+
+  }
+
   if(!showRoomColors){
 
     return "rgba(59,130,246,0.15)";
@@ -385,7 +435,8 @@ function getRoomFill(room){
 function hexToRGBA(hex,opacity){
 
   hex =
-    hex.replace("#","");
+    (hex || "")
+      .replace("#","");
 
   if(hex.length !== 6){
 
