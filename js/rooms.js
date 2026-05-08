@@ -93,25 +93,50 @@ function renderFloor(){
 
   rooms.forEach(room=>{
 
-    if(
-      !Array.isArray(room.points)
+    let normalizedPoints = [];
+
+    // SUPPORT OLD STRING FORMAT
+
+    if(Array.isArray(room.points)){
+
+      normalizedPoints =
+        room.points;
+
+    }
+
+    else if(
+      typeof room.points ===
+      "string"
     ){
 
-      console.error(
-        "Invalid room points",
-        room
-      );
+      normalizedPoints =
+        room.points
+          .split(" ")
+          .map(pair=>{
 
-      return;
+            const [x,y] =
+              pair.split(",");
+
+            return {
+
+              x:Number(x),
+
+              y:Number(y)
+
+            };
+
+          });
 
     }
 
     const safePoints =
-      room.points.filter(
+      normalizedPoints.filter(
         p =>
           p &&
           typeof p.x === "number" &&
-          typeof p.y === "number"
+          typeof p.y === "number" &&
+          !Number.isNaN(p.x) &&
+          !Number.isNaN(p.y)
       );
 
     if(!safePoints.length){
