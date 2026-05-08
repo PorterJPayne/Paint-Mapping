@@ -20,8 +20,6 @@ let buildingData = {
 
 };
 
-// CURRENT STATE
-
 let currentFloor =
   "1st-floor";
 
@@ -31,23 +29,17 @@ let currentRoom =
 let currentView =
   "map";
 
-// DRAWING
-
 let drawMode =
   false;
 
 let drawPoints =
   [];
 
-// EDITING
-
 let editMode =
   false;
 
 let draggingVertex =
   null;
-
-// MAP MOVEMENT
 
 let zoom = 1;
 
@@ -62,8 +54,6 @@ let dragStartX = 0;
 
 let dragStartY = 0;
 
-// ROOM MEMORY
-
 let lastSelectedRooms = {
 
   "1st-floor":null,
@@ -74,26 +64,21 @@ let lastSelectedRooms = {
 
 };
 
-// ROOM COLORS
+let showRoomColors =
+  true;
 
-let showRoomColors = true;
+const MAP_WIDTH =
+  2000;
 
-// MAP SIZE
-
-const MAP_WIDTH = 2000;
-
-const MAP_HEIGHT = 743;
-
-// HELPERS
+const MAP_HEIGHT =
+  743;
 
 function getFloor(){
 
-  return (
-    buildingData
-      .floors[
-        currentFloor
-      ]
-  );
+  return buildingData
+    .floors[
+      currentFloor
+    ];
 
 }
 
@@ -116,36 +101,6 @@ function getInventoryPaint(id){
       paint =>
         paint.inventoryId === id
     );
-
-}
-
-function getPaintUsageCount(id){
-
-  let count = 0;
-
-  Object.values(
-    buildingData.floors
-  ).forEach(floor=>{
-
-    floor.rooms.forEach(room=>{
-
-      room.paints.forEach(ref=>{
-
-        if(
-          ref.inventoryId === id
-        ){
-
-          count++;
-
-        }
-
-      });
-
-    });
-
-  });
-
-  return count;
 
 }
 
