@@ -18,6 +18,8 @@ const backToMapBtn =
     "backToMapBtn"
   );
 
+let showRoomColors = true;
+
 function openInventoryView(){
 
   currentView = "inventory";
@@ -47,6 +49,44 @@ document.getElementById(
 
 backToMapBtn.onclick =
   closeInventoryView;
+
+function getRoomsUsingPaint(id){
+
+  const rooms = [];
+
+  Object.entries(
+    buildingData.floors
+  ).forEach(
+    ([floorName,floor])=>{
+
+      floor.rooms.forEach(room=>{
+
+        room.paints.forEach(ref=>{
+
+          if(
+            ref.inventoryId === id
+          ){
+
+            rooms.push({
+
+              floor:floorName,
+
+              room:room.name
+
+            });
+
+          }
+
+        });
+
+      });
+
+    }
+  );
+
+  return rooms;
+
+}
 
 function renderInventory(){
 
@@ -154,6 +194,11 @@ function renderInventory(){
 
 function openInventoryModal(paint){
 
+  const usedIn =
+    getRoomsUsingPaint(
+      paint.inventoryId
+    );
+
   const modal =
     document.createElement("div");
 
@@ -164,45 +209,139 @@ function openInventoryModal(paint){
 
     <div class="inventory-modal-content">
 
-      <h2>
-        ${paint.color || ""}
-      </h2>
-
-      <input id="invColor" placeholder="Color Name" value="${paint.color || ""}">
-
-      <input id="invCode" placeholder="Code" value="${paint.code || ""}">
-
-      <input id="invKiln" placeholder="Kiln Spec" value="${paint.kilnSpec || ""}">
-
-      <input id="invBrand" placeholder="Brand" value="${paint.brand || ""}">
-
-      <input id="invFinish" placeholder="Finish" value="${paint.finish || ""}">
-
-      <input id="invSurface" placeholder="Surface" value="${paint.surface || ""}">
-
-      <input id="invHex" placeholder="Hex Color" value="${paint.hex || ""}">
-
-      <input id="invQuantity" placeholder="Quantity" value="${paint.quantity || ""}">
-
-      <input id="invLowStock" placeholder="Low Stock Threshold" value="${paint.lowStock || ""}">
-
-      <input id="invLocation" placeholder="Storage Location" value="${paint.location || ""}">
-
-      <textarea id="invNotes" placeholder="Notes">${paint.notes || ""}</textarea>
-
-      <button id="saveInventoryPaint">
-        Save
-      </button>
-
-      <button
-        id="deleteInventoryPaint"
+      <div
+        class="inventory-modal-swatch"
         style="
-          background:#b42318;
-          margin-top:10px;
+          background:
+            ${paint.hex || "#ddd"};
         "
-      >
-        Delete
-      </button>
+      ></div>
+
+      <div class="inventory-modal-body">
+
+        <input
+          id="invColor"
+          class="inventory-input large-input"
+          placeholder="Color Name"
+          value="${paint.color || ""}"
+        >
+
+        <input
+          id="invCode"
+          class="inventory-input"
+          placeholder="Code"
+          value="${paint.code || ""}"
+        >
+
+        <input
+          id="invKiln"
+          class="inventory-input"
+          placeholder="Kiln Spec"
+          value="${paint.kilnSpec || ""}"
+        >
+
+        <div class="inventory-row">
+
+          <input
+            id="invBrand"
+            class="inventory-input"
+            placeholder="Brand"
+            value="${paint.brand || ""}"
+          >
+
+          <input
+            id="invFinish"
+            class="inventory-input"
+            placeholder="Finish"
+            value="${paint.finish || ""}"
+          >
+
+        </div>
+
+        <div class="inventory-row">
+
+          <input
+            id="invQuantity"
+            class="inventory-input"
+            placeholder="Quantity"
+            value="${paint.quantity || ""}"
+          >
+
+          <input
+            id="invLowStock"
+            class="inventory-input"
+            placeholder="Low Stock"
+            value="${paint.lowStock || ""}"
+          >
+
+        </div>
+
+        <input
+          id="invLocation"
+          class="inventory-input"
+          placeholder="Storage Location"
+          value="${paint.location || ""}"
+        >
+
+        <input
+          id="invHex"
+          class="inventory-input"
+          placeholder="# Hex Color"
+          value="${paint.hex || ""}"
+        >
+
+        <div class="used-in-section">
+
+          <h3>
+            Used In
+          </h3>
+
+          ${
+            usedIn.length
+            ? usedIn.map(
+              room=>`
+                <div class="used-room">
+
+                  ${room.room}
+
+                  <span>
+                    ${room.floor}
+                  </span>
+
+                </div>
+              `
+            ).join("")
+            : `
+              <div class="used-room">
+                Not used yet
+              </div>
+            `
+          }
+
+        </div>
+
+        <textarea
+          id="invNotes"
+          class="inventory-input"
+          placeholder="Notes"
+        >${paint.notes || ""}</textarea>
+
+        <div class="inventory-modal-actions">
+
+          <button id="saveInventoryPaint">
+            Save
+          </button>
+
+          <button
+            id="deleteInventoryPaint"
+            class="danger-btn"
+          >
+            Delete
+          </button>
+
+        </div>
+
+      </div>
 
     </div>
 
@@ -217,6 +356,17 @@ function openInventoryModal(paint){
       modal.remove();
 
     }
+
+  };
+
+  document.getElementById(
+    "invHex"
+  ).oninput = (e)=>{
+
+    modal.querySelector(
+      ".inventory-modal-swatch"
+    ).style.background =
+      e.target.value;
 
   };
 
@@ -249,11 +399,6 @@ function openInventoryModal(paint){
         "invFinish"
       ).value;
 
-    paint.surface =
-      document.getElementById(
-        "invSurface"
-      ).value;
-
     paint.hex =
       document.getElementById(
         "invHex"
@@ -282,6 +427,8 @@ function openInventoryModal(paint){
     saveData();
 
     renderInventory();
+
+    renderFloor();
 
     if(currentRoom){
 
@@ -331,6 +478,8 @@ function openInventoryModal(paint){
 
     renderInventory();
 
+    renderFloor();
+
     modal.remove();
 
   };
@@ -355,7 +504,6 @@ window.addEventListener(
         kilnSpec:"",
         brand:"",
         finish:"",
-        surface:"",
         hex:"#cccccc",
         quantity:"",
         lowStock:"",
