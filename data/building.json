@@ -1,312 +1,55 @@
 {
-  "inventory": [
-    {
-      "inventoryId": "INV-EHG927",
-      "color": "Pure White",
-      "code": "SW7005",
-      "kilnSpec": "KP001",
-      "brand": "Sherwin Williams",
-      "finish": "Semi-Gloss",
-      "surface": "Walls",
-      "hex": "#EDEBE5",
-      "quantity": "1/2",
-      "lowStock": "0",
-      "location": "Lehi 1 Storage",
-      "notes": "Gross. Rusty can."
-    },
-    {
-      "inventoryId": "INV-UTDR9F",
-      "color": "Argos",
-      "code": "SW7065",
-      "kilnSpec": "KP002",
-      "brand": "Sherwin Williams",
-      "finish": "Eggshell",
-      "surface": "Walls",
-      "hex": "#BDBDB7",
-      "quantity": "5",
-      "lowStock": "0",
-      "location": "Lehi 1 Storage",
-      "notes": ""
-    },
-    {
-      "inventoryId": "INV-I9TE8Y",
-      "color": "Castilian Pink",
-      "code": "S170-3",
-      "kilnSpec": "KP003",
-      "brand": "Behr",
-      "finish": "Eggshell, Low Luster",
-      "surface": "Walls",
-      "hex": "#D3B2A9",
-      "quantity": "2",
-      "lowStock": "0",
-      "location": "Lehi 1 Storage",
-      "notes": ""
-    },
-    {
-      "inventoryId": "INV-D956B6",
-      "color": "Green Tea Leaf",
-      "code": "PPG1128-5",
-      "kilnSpec": "KP006",
-      "brand": "PPG",
-      "finish": "Eggshell",
-      "surface": "Walls",
-      "hex": "#929988",
-      "quantity": "5",
-      "lowStock": "1",
-      "location": "Lehi 1 Storage",
-      "notes": ""
-    },
-    {
-      "inventoryId": "INV-4YN9FP",
-      "color": "Tricorn Black",
-      "code": "SW6258",
-      "kilnSpec": "KP007",
-      "brand": "Sherwin Williams",
-      "finish": "Satin",
-      "surface": "Walls",
-      "hex": "#2F2F2F",
-      "quantity": "1",
-      "lowStock": "0",
-      "location": "Lehi 1 Storage",
-      "notes": ""
-    },
-    {
-      "inventoryId": "INV-0TYN8V",
-      "color": "Lanyard",
-      "code": "SW7680",
-      "kilnSpec": "KP008",
-      "brand": "Sherwin Williams",
-      "finish": "Eggshell, Cashmere",
-      "surface": "Walls",
-      "hex": "#BE9871",
-      "quantity": "1",
-      "lowStock": "0",
-      "location": "Lehi 1 Storage",
-      "notes": ""
-    },
-    {
-      "inventoryId": "INV-3YP9FL",
-      "color": "Tempe Star",
-      "code": "SW6229",
-      "kilnSpec": "KP017",
-      "brand": "Sherwin Williams",
-      "finish": "Eggshell",
-      "surface": "Walls",
-      "hex": "#466067",
-      "quantity": "7",
-      "lowStock": "0",
-      "location": "Lehi 1 Storage",
-      "notes": ""
-    }
-  ],
+  "inventory": [],
   "floors": {
     "1st-floor": {
-      "image": "images/1st-floor.png",
       "rooms": [
         {
-          "id": "ea13b9dd-7fbd-46bb-b55b-90158a285d6c",
-          "name": "giughijhg",
+          "id": "f4a0b44e-5c30-41b5-8617-f3a2a9f5df92",
+          "name": "jhbkhjb",
           "notes": "",
           "paints": [],
           "primaryPaintId": null,
           "points": [
             {
-              "x": 406.0941828254848,
-              "y": 90.05954653997688
+              "x": 546,
+              "y": 97
             },
             {
-              "x": 408.31024930747924,
-              "y": 236.31992210379818
+              "x": 546,
+              "y": 97
             },
             {
-              "x": 596.6759002770084,
-              "y": 218.59139173242588
+              "x": 539,
+              "y": 195
             },
             {
-              "x": 760.6648199445983,
-              "y": 94.49167913281994
+              "x": 539,
+              "y": 195
+            },
+            {
+              "x": 666,
+              "y": 187
+            },
+            {
+              "x": 666,
+              "y": 187
+            },
+            {
+              "x": 658,
+              "y": 134
+            },
+            {
+              "x": 658,
+              "y": 134
             }
           ]
         }
       ]
     },
     "2nd-floor": {
-      "image": "images/2nd-floor.png",
-      "rooms": [
-        {
-          "id": "PS 32.1",
-          "points": [
-            {
-              "x": 59.66794184098945,
-              "y": 281.2396910113272
-            },
-            {
-              "x": 60.11742240891078,
-              "y": 470.47102584109393
-            },
-            {
-              "x": 280.36290069036306,
-              "y": 470.02154523579753
-            },
-            {
-              "x": 280.36290069036306,
-              "y": 280.3407298007345
-            }
-          ],
-          "paints": [],
-          "notes": ""
-        },
-        {
-          "id": "Timpanogos",
-          "points": [
-            {
-              "x": 774.976400020112,
-              "y": 462.81788535198433
-            },
-            {
-              "x": 851.2790758773326,
-              "y": 462.12211623007397
-            },
-            {
-              "x": 851.5109989042543,
-              "y": 544.2228726155005
-            },
-            {
-              "x": 776.367938181642,
-              "y": 544.6867186967742
-            }
-          ],
-          "paints": [],
-          "notes": ""
-        },
-        {
-          "id": "Cottonwood Meeting Room",
-          "points": [
-            {
-              "x": 1348.5898868014483,
-              "y": 360.57605513895624
-            },
-            {
-              "x": 1425.8401267481345,
-              "y": 360.57605513895624
-            },
-            {
-              "x": 1426.3244542713112,
-              "y": 475.6038444745704
-            },
-            {
-              "x": 1347.6212317550949,
-              "y": 476.0881720086151
-            }
-          ],
-          "paints": [],
-          "notes": ""
-        },
-        {
-          "id": "Alta Conference Room",
-          "points": [
-            {
-              "x": 1427.2361866432577,
-              "y": 360.02173325543555
-            },
-            {
-              "x": 1427.918725447655,
-              "y": 475.82582049646004
-            },
-            {
-              "x": 1515.0561794757116,
-              "y": 476.2808463795289
-            },
-            {
-              "x": 1515.7387182801087,
-              "y": 359.33919443083226
-            }
-          ],
-          "paints": [],
-          "notes": ""
-        },
-        {
-          "id": "Canyonlands Conference Room",
-          "points": [
-            {
-              "x": 1347.565021092997,
-              "y": 277.18802652213026
-            },
-            {
-              "x": 1348.0677086797798,
-              "y": 358.6234167377753
-            },
-            {
-              "x": 1515.2113312851106,
-              "y": 357.86938534688977
-            },
-            {
-              "x": 1515.2113312851106,
-              "y": 276.1826513342828
-            }
-          ],
-          "paints": [],
-          "notes": ""
-        },
-        {
-          "id": "PO 55",
-          "points": [
-            {
-              "x": 1580.9069928038118,
-              "y": 605.0837639313796
-            },
-            {
-              "x": 1580.2387788259043,
-              "y": 682.5965826285512
-            },
-            {
-              "x": 1645.3896416718858,
-              "y": 682.9306896056942
-            },
-            {
-              "x": 1645.7237486608394,
-              "y": 604.7496569542367
-            }
-          ],
-          "paints": [],
-          "notes": ""
-        },
-        {
-          "id": "799ee9f2-cabc-45c2-8274-c41cc81683e2",
-          "name": "ijhijhijh",
-          "points": [
-            {
-              "x": 1130.747922437673,
-              "y": 96.70774542924148
-            },
-            {
-              "x": 1130.747922437673,
-              "y": 189.78252987894595
-            },
-            {
-              "x": 1241.551246537396,
-              "y": 194.214662471789
-            },
-            {
-              "x": 1245.9833795013851,
-              "y": 96.70774542924148
-            }
-          ],
-          "paints": [
-            {
-              "inventoryId": "INV-3YP9FL"
-            },
-            {
-              "inventoryId": "INV-0TYN8V"
-            }
-          ],
-          "primaryPaintId": "INV-3YP9FL",
-          "notes": ""
-        }
-      ]
+      "rooms": []
     },
     "5th-floor": {
-      "image": "images/5th-floor.png",
       "rooms": []
     }
   }
