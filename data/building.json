@@ -107,7 +107,11 @@
           "id": "6ae8ca30-330d-4519-bb60-89cf10095f6c",
           "name": "Room 1",
           "notes": "",
-          "paints": [],
+          "paints": [
+            {
+              "inventoryId": "INV-D956B6"
+            }
+          ],
           "primaryPaintId": null,
           "points": [
             {
