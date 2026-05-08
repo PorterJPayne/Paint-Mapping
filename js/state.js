@@ -1,53 +1,18 @@
-const MAP_WIDTH = 2000;
-const MAP_HEIGHT = 743;
-
-let currentFloor = "1st-floor";
-let currentRoom = null;
-
-const lastSelectedRooms = {
-
-  "1st-floor":null,
-  "2nd-floor":null,
-  "5th-floor":null
-
-};
-
-let currentView = "map";
-
-let drawMode = false;
-let editMode = false;
-
-let drawPoints = [];
-
-let zoom = 1;
-let panX = 0;
-let panY = 0;
-
-let draggingMap = false;
-
-let dragStartX = 0;
-let dragStartY = 0;
-
-let draggingVertex = null;
-
-const defaultData = {
+let buildingData = {
 
   inventory:[],
 
   floors:{
 
     "1st-floor":{
-      image:"images/1st-floor.png",
       rooms:[]
     },
 
     "2nd-floor":{
-      image:"images/2nd-floor.png",
       rooms:[]
     },
 
     "5th-floor":{
-      image:"images/5th-floor.png",
       rooms:[]
     }
 
@@ -55,13 +20,137 @@ const defaultData = {
 
 };
 
-let buildingData =
-  JSON.parse(
-    localStorage.getItem("paintMapData")
-  ) || defaultData;
+// CURRENT STATE
 
-if(!buildingData.inventory){
+let currentFloor =
+  "1st-floor";
 
-  buildingData.inventory = [];
+let currentRoom =
+  null;
+
+let currentView =
+  "map";
+
+// DRAWING
+
+let drawMode =
+  false;
+
+let drawPoints =
+  [];
+
+// EDITING
+
+let editMode =
+  false;
+
+let draggingVertex =
+  null;
+
+// MAP MOVEMENT
+
+let zoom = 1;
+
+let panX = 0;
+
+let panY = 0;
+
+let draggingMap =
+  false;
+
+let dragStartX = 0;
+
+let dragStartY = 0;
+
+// ROOM MEMORY
+
+let lastSelectedRooms = {
+
+  "1st-floor":null,
+
+  "2nd-floor":null,
+
+  "5th-floor":null
+
+};
+
+// ROOM COLORS
+
+let showRoomColors = true;
+
+// MAP SIZE
+
+const MAP_WIDTH = 2000;
+
+const MAP_HEIGHT = 743;
+
+// HELPERS
+
+function getFloor(){
+
+  return (
+    buildingData
+      .floors[
+        currentFloor
+      ]
+  );
+
+}
+
+function getCurrentRoom(){
+
+  return getFloor()
+    .rooms
+    .find(
+      room =>
+        room.id === currentRoom
+    );
+
+}
+
+function getInventoryPaint(id){
+
+  return buildingData
+    .inventory
+    .find(
+      paint =>
+        paint.inventoryId === id
+    );
+
+}
+
+function getPaintUsageCount(id){
+
+  let count = 0;
+
+  Object.values(
+    buildingData.floors
+  ).forEach(floor=>{
+
+    floor.rooms.forEach(room=>{
+
+      room.paints.forEach(ref=>{
+
+        if(
+          ref.inventoryId === id
+        ){
+
+          count++;
+
+        }
+
+      });
+
+    });
+
+  });
+
+  return count;
+
+}
+
+function createInventoryId(){
+
+  return crypto.randomUUID();
 
 }
