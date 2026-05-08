@@ -108,8 +108,8 @@
           "name": "ijhgjhg",
           "points": [
             {
-              "x": 1554.0166204986149,
-              "y": 114.43627580061377
+              "x": 1491.96675900277,
+              "y": 138.81300506125064
             },
             {
               "x": 1445.4293628808866,
@@ -129,7 +129,7 @@
               "inventoryId": "INV-I9TE8Y"
             }
           ],
-          "primaryPaintId": null,
+          "primaryPaintId": "INV-I9TE8Y",
           "notes": ""
         }
       ]
