@@ -47,6 +47,61 @@ function renderRoomList(){
 
 }
 
+function normalizeRoomPoints(room){
+
+  // OLD STRING FORMAT
+
+  if(
+    typeof room.points ===
+    "string"
+  ){
+
+    room.points =
+      room.points
+        .split(" ")
+        .map(pair=>{
+
+          const [x,y] =
+            pair.split(",");
+
+          return {
+
+            x:Number(x),
+
+            y:Number(y)
+
+          };
+
+        });
+
+    saveData();
+
+  }
+
+  // SAFETY
+
+  if(
+    !Array.isArray(room.points)
+  ){
+
+    room.points = [];
+
+  }
+
+  // FILTER INVALID
+
+  room.points =
+    room.points.filter(
+      p =>
+        p &&
+        typeof p.x === "number" &&
+        typeof p.y === "number" &&
+        !Number.isNaN(p.x) &&
+        !Number.isNaN(p.y)
+    );
+
+}
+
 function selectRoom(id){
 
   currentRoom = id;
@@ -59,6 +114,8 @@ function selectRoom(id){
     getCurrentRoom();
 
   if(!room) return;
+
+  normalizeRoomPoints(room);
 
   emptyState.classList.add(
     "hidden"
@@ -93,53 +150,9 @@ function renderFloor(){
 
   rooms.forEach(room=>{
 
-    let normalizedPoints = [];
+    normalizeRoomPoints(room);
 
-    // SUPPORT OLD STRING FORMAT
-
-    if(Array.isArray(room.points)){
-
-      normalizedPoints =
-        room.points;
-
-    }
-
-    else if(
-      typeof room.points ===
-      "string"
-    ){
-
-      normalizedPoints =
-        room.points
-          .split(" ")
-          .map(pair=>{
-
-            const [x,y] =
-              pair.split(",");
-
-            return {
-
-              x:Number(x),
-
-              y:Number(y)
-
-            };
-
-          });
-
-    }
-
-    const safePoints =
-      normalizedPoints.filter(
-        p =>
-          p &&
-          typeof p.x === "number" &&
-          typeof p.y === "number" &&
-          !Number.isNaN(p.x) &&
-          !Number.isNaN(p.y)
-      );
-
-    if(!safePoints.length){
+    if(!room.points.length){
 
       return;
 
@@ -155,7 +168,7 @@ function renderFloor(){
 
       "points",
 
-      safePoints
+      room.points
         .map(
           p=>`${p.x},${p.y}`
         )
@@ -168,10 +181,18 @@ function renderFloor(){
       getRoomFill(room)
     );
 
+    const primary =
+      getInventoryPaint(
+        room.primaryPaintId
+      );
+
     polygon.setAttribute(
       "stroke",
       room.id === currentRoom
-        ? "#2563eb"
+        ? (
+            primary?.hex ||
+            "#2563eb"
+          )
         : "#1e293b"
     );
 
@@ -195,7 +216,7 @@ function renderFloor(){
       polygon
     );
 
-    // VERTEX EDITING
+    // DRAGGABLE VERTICES
 
     if(
       editMode
@@ -203,7 +224,7 @@ function renderFloor(){
       room.id === currentRoom
     ){
 
-      safePoints.forEach(
+      room.points.forEach(
         (point,index)=>{
 
           const vertex =
@@ -229,7 +250,17 @@ function renderFloor(){
 
           vertex.setAttribute(
             "fill",
-            "#2563eb"
+            primary?.hex || "#2563eb"
+          );
+
+          vertex.setAttribute(
+            "stroke",
+            "#ffffff"
+          );
+
+          vertex.setAttribute(
+            "stroke-width",
+            "2"
           );
 
           vertex.style.cursor =
