@@ -124,7 +124,11 @@
               "y": 134.38087246840757
             }
           ],
-          "paints": [],
+          "paints": [
+            {
+              "inventoryId": "INV-I9TE8Y"
+            }
+          ],
           "primaryPaintId": null,
           "notes": ""
         }
