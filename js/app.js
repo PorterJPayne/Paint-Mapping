@@ -1,3 +1,4 @@
+//second try
 drawBtn.onclick =
   startDraw;
 
