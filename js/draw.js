@@ -10,12 +10,12 @@ function renderDrawPreview(){
 
     circle.setAttribute(
       "cx",
-      point[0]
+      point.x
     );
 
     circle.setAttribute(
       "cy",
-      point[1]
+      point.y
     );
 
     circle.setAttribute(
@@ -38,12 +38,12 @@ function renderDrawPreview(){
 
     label.setAttribute(
       "x",
-      point[0] + 10
+      point.x + 10
     );
 
     label.setAttribute(
       "y",
-      point[1] - 10
+      point.y - 10
     );
 
     label.setAttribute(
@@ -80,7 +80,7 @@ function renderDrawPreview(){
       "points",
       drawPoints
         .map(
-          p => `${p[0]},${p[1]}`
+          p => `${p.x},${p.y}`
         )
         .join(" ")
     );
@@ -173,21 +173,24 @@ function finishDraw(){
 
   getFloor().rooms.push({
 
-    id:roomName,
+    id:
+      crypto.randomUUID(),
 
-    points:drawPoints
-      .map(
-        p => `${p[0]},${p[1]}`
-      )
-      .join(" "),
+    name:roomName,
+
+    points:[...drawPoints],
 
     paints:[],
+
+    primaryPaintId:null,
 
     notes:""
 
   });
 
   saveData();
+
+  renderRoomList();
 
   stopDraw();
 
