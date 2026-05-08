@@ -15,8 +15,6 @@ undoBtn.onclick = ()=>{
 finishBtn.onclick =
   finishDraw;
 
-// DRAW CLICK
-
 overlay.addEventListener(
   "click",
   (event)=>{
@@ -46,8 +44,6 @@ overlay.addEventListener(
   }
 );
 
-// KEYBOARD SHORTCUTS
-
 document.addEventListener(
   "keydown",
   (e)=>{
@@ -73,8 +69,6 @@ document.addEventListener(
   }
 );
 
-// FLOOR SWITCHING
-
 floorSelect.onchange = ()=>{
 
   currentFloor =
@@ -88,39 +82,22 @@ floorSelect.onchange = ()=>{
   renderFloor();
 
   const rememberedRoom =
-    lastSelectedRooms[currentFloor];
+    lastSelectedRooms[
+      currentFloor
+    ];
 
   if(rememberedRoom){
 
-    selectRoom(rememberedRoom);
-
-  }
-
-  else{
-
-    currentRoom = null;
-
-    roomPanel.classList.add(
-      "hidden"
-    );
-
-    emptyState.classList.remove(
-      "hidden"
+    selectRoom(
+      rememberedRoom
     );
 
   }
 
 };
 
-// SEARCH
-
-searchInput.oninput = ()=>{
-
-  renderRoomList();
-
-};
-
-// ZOOM
+searchInput.oninput =
+  renderRoomList;
 
 mapViewport.addEventListener(
   "wheel",
@@ -169,8 +146,6 @@ mapViewport.addEventListener(
   { passive:false }
 );
 
-// PAN
-
 mapViewport.addEventListener(
   "mousedown",
   (e)=>{
@@ -188,13 +163,9 @@ mapViewport.addEventListener(
   }
 );
 
-// DRAGGING
-
 document.addEventListener(
   "mousemove",
   (e)=>{
-
-    // VERTEX DRAGGING
 
     if(draggingVertex){
 
@@ -233,8 +204,6 @@ document.addEventListener(
 
     }
 
-    // MAP PANNING
-
     if(!draggingMap) return;
 
     panX =
@@ -247,8 +216,6 @@ document.addEventListener(
 
   }
 );
-
-// MOUSE UP
 
 document.addEventListener(
   "mouseup",
@@ -267,15 +234,8 @@ document.addEventListener(
   }
 );
 
-// RESET VIEW
-
-resetViewBtn.onclick = ()=>{
-
-  centerMap();
-
-};
-
-// STARTUP
+resetViewBtn.onclick =
+  centerMap;
 
 window.addEventListener(
   "load",
