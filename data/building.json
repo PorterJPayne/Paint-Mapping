@@ -136,7 +136,11 @@
           "id": "568010a0-3088-4741-8557-e9f60f63552f",
           "name": "room 2",
           "notes": "",
-          "paints": [],
+          "paints": [
+            {
+              "inventoryId": "INV-0TYN8V"
+            }
+          ],
           "primaryPaintId": null,
           "points": [
             {
