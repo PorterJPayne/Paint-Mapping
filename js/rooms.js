@@ -103,12 +103,14 @@ function renderFloor(){
 
       "points",
 
-      room.points
-        .map(
-          p=>`${p.x},${p.y}`
-        )
-        .join(" ")
-
+     (Array.isArray(room.points)
+  ? room.points
+  : []
+)
+.map(
+  p=>`${p.x},${p.y}`
+)
+.join(" ")
     );
 
     polygon.setAttribute(
