@@ -3,16 +3,17 @@ function renderRoomList(){
   roomList.innerHTML = "";
 
   const rooms =
-    getFloor().rooms;
+    getFloor().rooms || [];
 
   const search =
-    searchInput.value
-      .toLowerCase();
+    (
+      searchInput.value || ""
+    ).toLowerCase();
 
   rooms
     .filter(room=>
 
-      room.name
+      (room.name || "")
         .toLowerCase()
         .includes(search)
 
@@ -33,9 +34,40 @@ function renderRoomList(){
         `;
 
       item.textContent =
-        room.name;
+        room.name || "Unnamed";
 
       item.onclick = ()=>{
+
+        // EXIT EDIT MODE
+        // WHEN SWITCHING ROOMS
+
+        if(
+          currentRoom !== room.id
+        ){
+
+          editMode = false;
+
+          editBtn.classList.remove(
+            "hidden"
+          );
+
+          saveBtn.classList.add(
+            "hidden"
+          );
+
+          cancelEditBtn.classList.add(
+            "hidden"
+          );
+
+          notesDisplay.classList.remove(
+            "hidden"
+          );
+
+          notesField.classList.add(
+            "hidden"
+          );
+
+        }
 
         selectRoom(room.id);
 
@@ -146,7 +178,7 @@ function renderFloor(){
   overlay.innerHTML = "";
 
   const rooms =
-    getFloor().rooms;
+    getFloor().rooms || [];
 
   rooms.forEach(room=>{
 
@@ -193,20 +225,55 @@ function renderFloor(){
             primary?.hex ||
             "#2563eb"
           )
-        : "#1e293b"
+        : "#334155"
     );
 
     polygon.setAttribute(
       "stroke-width",
       room.id === currentRoom
-        ? "4"
+        ? "5"
         : "2"
+    );
+
+    polygon.setAttribute(
+      "stroke-opacity",
+      room.id === currentRoom
+        ? "1"
+        : "0.65"
     );
 
     polygon.style.cursor =
       "pointer";
 
     polygon.onclick = ()=>{
+
+      if(
+        currentRoom !== room.id
+      ){
+
+        editMode = false;
+
+        editBtn.classList.remove(
+          "hidden"
+        );
+
+        saveBtn.classList.add(
+          "hidden"
+        );
+
+        cancelEditBtn.classList.add(
+          "hidden"
+        );
+
+        notesDisplay.classList.remove(
+          "hidden"
+        );
+
+        notesField.classList.add(
+          "hidden"
+        );
+
+      }
 
       selectRoom(room.id);
 
