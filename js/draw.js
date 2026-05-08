@@ -1,3 +1,4 @@
+//second try
 function startDraw(){
 
   drawMode = true;
