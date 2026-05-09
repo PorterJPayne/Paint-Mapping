@@ -18,7 +18,6 @@ const backToMapBtn =
     "backToMapBtn"
   );
 
-let showRoomColors = true;
 
 function openInventoryView(){
 
