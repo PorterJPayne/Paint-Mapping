@@ -49,8 +49,8 @@ mapViewport.addEventListener(
 
     const factor =
       event.deltaY < 0
-      ? 1.05
-      : 0.95;
+? 1.03
+: 0.97;
 
     const rect =
       mapViewport.getBoundingClientRect();
