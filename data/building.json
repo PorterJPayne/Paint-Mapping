@@ -25,6 +25,19 @@
       "lowStock": "",
       "location": "",
       "notes": ""
+    },
+    {
+      "inventoryId": "INV-X0VIFF",
+      "color": "",
+      "code": "",
+      "kilnSpec": "",
+      "brand": "",
+      "finish": "",
+      "hex": "#cccccc",
+      "quantity": "",
+      "lowStock": "",
+      "location": "",
+      "notes": ""
     }
   ],
   "floors": {
