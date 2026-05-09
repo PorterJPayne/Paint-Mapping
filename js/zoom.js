@@ -1,140 +1,24 @@
-drawBtn.onclick =
-  startDraw;
+function updateTransform(){
 
-cancelBtn.onclick =
-  stopDraw;
+  mapTransform.style.transform =
+    `
+    translate(${panX}px,${panY}px)
+    scale(${zoom})
+    `;
 
-undoBtn.onclick = ()=>{
+}
 
-  drawPoints.pop();
+function centerMap(){
 
-  renderFloor();
+  zoom = 1;
 
-};
+  panX = 0;
 
-finishBtn.onclick =
-  finishDraw;
+  panY = 0;
 
-// INVENTORY BUTTON
+  updateTransform();
 
-inventoryBtn.onclick = ()=>{
-
-  if(
-    typeof openInventoryView ===
-    "function"
-  ){
-
-    openInventoryView();
-
-  }
-
-};
-
-// DRAWING
-
-overlay.addEventListener(
-  "click",
-  (event)=>{
-
-    if(!drawMode) return;
-
-    const rect =
-      overlay.getBoundingClientRect();
-
-    const x =
-      ((event.clientX - rect.left)
-      / rect.width)
-      * MAP_WIDTH;
-
-    const y =
-      ((event.clientY - rect.top)
-      / rect.height)
-      * MAP_HEIGHT;
-
-    drawPoints.push({
-      x,
-      y
-    });
-
-    renderFloor();
-
-  }
-);
-
-// KEYBOARD
-
-document.addEventListener(
-  "keydown",
-  (e)=>{
-
-    if(!drawMode) return;
-
-    if(e.key === "Enter"){
-
-      finishDraw();
-
-    }
-
-    if(e.key === "Backspace"){
-
-      e.preventDefault();
-
-      drawPoints.pop();
-
-      renderFloor();
-
-    }
-
-  }
-);
-
-// FLOOR SWITCHING
-
-floorSelect.onchange = ()=>{
-
-  currentFloor =
-    floorSelect.value;
-
-  floorImage.src =
-    `images/${currentFloor}.png`;
-
-  renderRoomList();
-
-  renderFloor();
-
-  const rememberedRoom =
-    lastSelectedRooms[
-      currentFloor
-    ];
-
-  if(rememberedRoom){
-
-    selectRoom(
-      rememberedRoom
-    );
-
-  }
-
-  else{
-
-    currentRoom = null;
-
-    roomPanel.classList.add(
-      "hidden"
-    );
-
-    emptyState.classList.remove(
-      "hidden"
-    );
-
-  }
-
-};
-
-// SEARCH
-
-searchInput.oninput =
-  renderRoomList;
+}
 
 // ZOOM
 
@@ -191,7 +75,9 @@ mapViewport.addEventListener(
   "mousedown",
   (e)=>{
 
-    if(draggingVertex) return;
+    if(
+      draggingVertex
+    ) return;
 
     draggingMap = true;
 
@@ -204,52 +90,9 @@ mapViewport.addEventListener(
   }
 );
 
-// DRAGGING
-
 document.addEventListener(
   "mousemove",
   (e)=>{
-
-    // VERTEX
-
-    if(draggingVertex){
-
-      const rect =
-        overlay.getBoundingClientRect();
-
-      const x =
-        ((e.clientX - rect.left)
-        / rect.width)
-        * MAP_WIDTH;
-
-      const y =
-        ((e.clientY - rect.top)
-        / rect.height)
-        * MAP_HEIGHT;
-
-      const room =
-        getFloor().rooms.find(
-          r =>
-            r.id ===
-            draggingVertex.roomId
-        );
-
-      if(!room) return;
-
-      room.points[
-        draggingVertex.index
-      ] = {
-        x,
-        y
-      };
-
-      renderFloor();
-
-      return;
-
-    }
-
-    // MAP
 
     if(!draggingMap) return;
 
@@ -264,65 +107,11 @@ document.addEventListener(
   }
 );
 
-// MOUSE UP
-
 document.addEventListener(
   "mouseup",
   ()=>{
 
     draggingMap = false;
-
-    if(draggingVertex){
-
-      saveData();
-
-    }
-
-    draggingVertex = null;
-
-  }
-);
-
-// RESET VIEW
-
-resetViewBtn.onclick =
-  centerMap;
-
-// STARTUP
-
-window.addEventListener(
-  "load",
-  async ()=>{
-
-    try{
-
-      // CLOUD LOAD
-
-      await loadCloudData();
-
-    }
-
-    catch(error){
-
-      console.error(
-        "Cloud load failed",
-        error
-      );
-
-    }
-
-    // IMAGE
-
-    floorImage.src =
-      `images/${currentFloor}.png`;
-
-    // RENDER
-
-    renderRoomList();
-
-    centerMap();
-
-    renderFloor();
 
   }
 );
