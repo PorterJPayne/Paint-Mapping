@@ -206,24 +206,43 @@ function openInventoryModal(paint){
 
   modal.innerHTML = `
 
-    <div class="inventory-modal-content">
+  <div class="inventory-modal-content">
 
-      <div
-        class="inventory-modal-swatch"
-        style="
-          background:
-            ${paint.hex || "#ddd"};
-        "
-      ></div>
+    <div
+      class="inventory-modal-swatch"
+      style="
+        background:
+          ${paint.hex || "#ddd"};
+      "
+    >
 
-      <div class="inventory-modal-body">
+      <div class="inventory-modal-top-actions">
 
-        <input
-          id="invColor"
-          class="inventory-input large-input"
-          placeholder="Color Name"
-          value="${paint.color || ""}"
+        <button id="saveInventoryPaint">
+          Save
+        </button>
+
+        <button
+          id="deleteInventoryPaint"
+          class="danger-btn"
         >
+          Delete
+        </button>
+
+      </div>
+
+    </div>
+
+    <div class="inventory-modal-body">
+
+      <input
+        id="invColor"
+        class="inventory-input large-input"
+        placeholder="Color Name"
+        value="${paint.color || ""}"
+      >
+
+      <div class="inventory-row">
 
         <input
           id="invCode"
@@ -239,55 +258,63 @@ function openInventoryModal(paint){
           value="${paint.kilnSpec || ""}"
         >
 
-        <div class="inventory-row">
+      </div>
 
-          <input
-            id="invBrand"
-            class="inventory-input"
-            placeholder="Brand"
-            value="${paint.brand || ""}"
-          >
+      <div class="inventory-row">
 
-          <input
-            id="invFinish"
-            class="inventory-input"
-            placeholder="Finish"
-            value="${paint.finish || ""}"
-          >
+        <input
+          id="invBrand"
+          class="inventory-input"
+          placeholder="Brand"
+          value="${paint.brand || ""}"
+        >
 
-        </div>
+        <input
+          id="invFinish"
+          class="inventory-input"
+          placeholder="Finish"
+          value="${paint.finish || ""}"
+        >
 
-        <div class="inventory-row">
+      </div>
 
-          <input
-            id="invQuantity"
-            class="inventory-input"
-            placeholder="Quantity"
-            value="${paint.quantity || ""}"
-          >
+      <div class="inventory-row">
 
-          <input
-            id="invLowStock"
-            class="inventory-input"
-            placeholder="Low Stock"
-            value="${paint.lowStock || ""}"
-          >
+        <input
+          id="invQuantity"
+          class="inventory-input"
+          placeholder="Gallons"
+          value="${paint.quantity || ""}"
+        >
 
-        </div>
+        <input
+          id="invLowStock"
+          class="inventory-input"
+          placeholder="Low Stock"
+          value="${paint.lowStock || ""}"
+        >
+
+      </div>
+
+      <div class="inventory-row">
 
         <input
           id="invLocation"
           class="inventory-input"
-          placeholder="Storage Location"
+          placeholder="Storage"
           value="${paint.location || ""}"
         >
 
         <input
           id="invHex"
           class="inventory-input"
-          placeholder="# Hex Color"
+          placeholder="# Hex"
           value="${paint.hex || ""}"
         >
+
+      </div>
+
+      <div class="inventory-bottom-grid">
 
         <div class="used-in-section">
 
@@ -319,24 +346,17 @@ function openInventoryModal(paint){
 
         </div>
 
-        <textarea
-          id="invNotes"
-          class="inventory-input"
-          placeholder="Notes"
-        >${paint.notes || ""}</textarea>
+        <div class="notes-section">
 
-        <div class="inventory-modal-actions">
+          <h3>
+            Notes
+          </h3>
 
-          <button id="saveInventoryPaint">
-            Save
-          </button>
-
-          <button
-            id="deleteInventoryPaint"
-            class="danger-btn"
-          >
-            Delete
-          </button>
+          <textarea
+            id="invNotes"
+            class="inventory-input inventory-notes"
+            placeholder="Notes"
+          >${paint.notes || ""}</textarea>
 
         </div>
 
@@ -344,8 +364,9 @@ function openInventoryModal(paint){
 
     </div>
 
-  `;
+  </div>
 
+`;
   document.body.appendChild(modal);
 
   modal.onclick = (e)=>{
