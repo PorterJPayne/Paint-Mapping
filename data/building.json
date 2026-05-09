@@ -50,9 +50,12 @@
           "paints": [
             {
               "inventoryId": "INV-X0VIFF"
+            },
+            {
+              "inventoryId": "INV-2W8PM3"
             }
           ],
-          "primaryPaintId": null,
+          "primaryPaintId": "INV-X0VIFF",
           "points": [
             {
               "x": 554,
