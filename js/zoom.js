@@ -10,29 +10,47 @@ function updateTransform(){
 
 function centerMap(){
 
-  zoom = 0.78;
-
   const viewportRect =
     mapViewport.getBoundingClientRect();
 
-  const mapWidth =
-    MAP_WIDTH;
+  const availableWidth =
+    viewportRect.width;
 
-  const mapHeight =
-    MAP_HEIGHT;
+  const availableHeight =
+    viewportRect.height;
+
+  const scaleX =
+    availableWidth
+    / MAP_WIDTH;
+
+  const scaleY =
+    availableHeight
+    / MAP_HEIGHT;
+
+  // FIT COMFORTABLY
+
+  zoom =
+    Math.min(
+      scaleX,
+      scaleY
+    ) * 0.92;
+
+  const scaledWidth =
+    MAP_WIDTH * zoom;
+
+  const scaledHeight =
+    MAP_HEIGHT * zoom;
 
   panX =
     (
-      viewportRect.width
-      -
-      mapWidth
+      availableWidth
+      - scaledWidth
     ) / 2;
 
   panY =
     (
-      viewportRect.height
-      -
-      mapHeight
+      availableHeight
+      - scaledHeight
     ) / 2;
 
   updateTransform();
