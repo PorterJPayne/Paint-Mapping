@@ -73,7 +73,11 @@
           "id": "6745ac6d-9a21-43d7-96c0-4f9218224abb",
           "name": "asdgg",
           "notes": "",
-          "paints": [],
+          "paints": [
+            {
+              "inventoryId": "INV-05P3UN"
+            }
+          ],
           "primaryPaintId": "INV-X0VIFF",
           "points": [
             {
