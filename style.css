@@ -604,6 +604,16 @@ select{
 
   max-width:92vw;
 
+  height:90vh;
+
+  background:white;
+
+  border-radius:20px;
+
+  display:flex;
+
+  flex-direction:column;
+
   overflow:hidden;
 
   padding:0;
@@ -620,7 +630,13 @@ select{
 
 .inventory-modal-body{
 
+  flex:1;
+
   padding:28px;
+
+  overflow-y:auto;
+
+  min-height:0;
 
 }
 
@@ -695,6 +711,14 @@ select{
   gap:12px;
 
   margin-top:20px;
+
+  position:sticky;
+
+  bottom:0;
+
+  background:white;
+
+  padding-top:12px;
 
 }
 
