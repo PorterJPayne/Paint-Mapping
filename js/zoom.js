@@ -2,7 +2,7 @@ function updateTransform(){
 
   mapTransform.style.transform =
     `
-    translate(${panX}px,${panY}px)
+    translate(${panX}px, ${panY}px)
     scale(${zoom})
     `;
 
@@ -12,9 +12,28 @@ function centerMap(){
 
   zoom = 1;
 
-  panX = 0;
+  const viewportRect =
+    mapViewport.getBoundingClientRect();
 
-  panY = 0;
+  const mapWidth =
+    MAP_WIDTH;
+
+  const mapHeight =
+    MAP_HEIGHT;
+
+  panX =
+    (
+      viewportRect.width
+      -
+      mapWidth
+    ) / 2;
+
+  panY =
+    (
+      viewportRect.height
+      -
+      mapHeight
+    ) / 2;
 
   updateTransform();
 
@@ -30,19 +49,8 @@ mapViewport.addEventListener(
 
     const factor =
       event.deltaY < 0
-      ? 1.02
-      : 0.98;
-
-    const oldZoom =
-      zoom;
-
-    zoom *= factor;
-
-    zoom =
-      Math.max(
-        0.2,
-        Math.min(zoom,5)
-      );
+      ? 1.05
+      : 0.95;
 
     const rect =
       mapViewport.getBoundingClientRect();
@@ -53,15 +61,25 @@ mapViewport.addEventListener(
     const mouseY =
       event.clientY - rect.top;
 
+    const worldX =
+      (mouseX - panX) / zoom;
+
+    const worldY =
+      (mouseY - panY) / zoom;
+
+    zoom *= factor;
+
+    zoom =
+      Math.max(
+        0.2,
+        Math.min(zoom,5)
+      );
+
     panX =
-      mouseX -
-      ((mouseX - panX)
-      * (zoom / oldZoom));
+      mouseX - (worldX * zoom);
 
     panY =
-      mouseY -
-      ((mouseY - panY)
-      * (zoom / oldZoom));
+      mouseY - (worldY * zoom);
 
     updateTransform();
 
@@ -75,9 +93,7 @@ mapViewport.addEventListener(
   "mousedown",
   (e)=>{
 
-    if(
-      draggingVertex
-    ) return;
+    if(draggingVertex) return;
 
     draggingMap = true;
 
