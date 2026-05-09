@@ -147,7 +147,11 @@
           "id": "f15e504b-1d2b-4710-8be9-683923f2f008",
           "name": "jhgjhgjhgjhg",
           "notes": "",
-          "paints": [],
+          "paints": [
+            {
+              "inventoryId": "INV-05P3UN"
+            }
+          ],
           "primaryPaintId": null,
           "points": [
             {
