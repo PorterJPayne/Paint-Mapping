@@ -10,7 +10,7 @@ function updateTransform(){
 
 function centerMap(){
 
-  zoom = 1;
+  zoom = 0.78;
 
   const viewportRect =
     mapViewport.getBoundingClientRect();
