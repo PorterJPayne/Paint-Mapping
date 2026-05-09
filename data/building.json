@@ -105,7 +105,11 @@
           "id": "6a495bf2-38ea-4ae5-bfdd-c41cd0988c61",
           "name": "zoom works",
           "notes": "",
-          "paints": [],
+          "paints": [
+            {
+              "inventoryId": "INV-TM9PH6"
+            }
+          ],
           "primaryPaintId": null,
           "points": [
             {
