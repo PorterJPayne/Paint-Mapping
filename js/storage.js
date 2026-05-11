@@ -79,7 +79,7 @@ async function saveCloudData(){
   try{
 
     await fetch(
-      "/api/saveData",
+      "/api/save",
       {
 
         method:"POST",
@@ -115,7 +115,7 @@ async function loadCloudData(){
 
     const response =
       await fetch(
-        "/api/loadData"
+        "/api/load"
       );
 
     if(
