@@ -1,5 +1,19 @@
 {
-  "inventory": [],
+  "inventory": [
+    {
+      "inventoryId": "INV-AG6FZX",
+      "color": "",
+      "code": "",
+      "kilnSpec": "",
+      "brand": "",
+      "finish": "",
+      "hex": "#cccccc",
+      "quantity": "",
+      "lowStock": "",
+      "location": "",
+      "notes": ""
+    }
+  ],
   "floors": {
     "1st-floor": {
       "rooms": []
