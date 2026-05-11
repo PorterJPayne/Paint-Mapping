@@ -131,7 +131,11 @@
           "id": "2ec5bd07-fd82-4cc6-8e83-bc057d1e2fa4",
           "name": "Community Entryway",
           "notes": "",
-          "paints": [],
+          "paints": [
+            {
+              "inventoryId": "INV-PJQQ3T"
+            }
+          ],
           "primaryPaintId": null,
           "points": [
             {
