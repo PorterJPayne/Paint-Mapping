@@ -337,13 +337,13 @@
         {
           "id": "479c7d2a-091f-4742-a682-6d48a0abec16",
           "name": "Whiteboard room 2",
-          "notes": "",
+          "notes": "Confirmed Color.",
           "paints": [
             {
               "inventoryId": "INV-PJQQ3T"
             }
           ],
-          "primaryPaintId": null,
+          "primaryPaintId": "INV-PJQQ3T",
           "points": [
             {
               "x": 1548.0025897344344,
