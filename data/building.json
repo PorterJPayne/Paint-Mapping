@@ -12,6 +12,19 @@
       "lowStock": "",
       "location": "",
       "notes": ""
+    },
+    {
+      "inventoryId": "INV-NCV1ZE",
+      "color": "",
+      "code": "",
+      "kilnSpec": "",
+      "brand": "",
+      "finish": "",
+      "hex": "#cccccc",
+      "quantity": "",
+      "lowStock": "",
+      "location": "",
+      "notes": ""
     }
   ],
   "floors": {
