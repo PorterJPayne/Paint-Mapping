@@ -457,13 +457,13 @@
         {
           "id": "c922bad5-492f-42ea-b3df-81e0004b6536",
           "name": "Support Offices",
-          "notes": "",
+          "notes": "Confirmed Color.",
           "paints": [
             {
               "inventoryId": "INV-TAU85X"
             }
           ],
-          "primaryPaintId": null,
+          "primaryPaintId": "INV-TAU85X",
           "points": [
             {
               "x": 480.8219320564722,
