@@ -251,7 +251,11 @@
           "id": "55e4111e-b17c-42e2-880f-b7e5e5bc6134",
           "name": "PS 14",
           "notes": "",
-          "paints": [],
+          "paints": [
+            {
+              "inventoryId": "INV-IO200I"
+            }
+          ],
           "primaryPaintId": null,
           "points": [
             {
