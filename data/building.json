@@ -396,7 +396,11 @@
           "id": "9e584e64-8d5c-4053-bf79-4f2adf66cf49",
           "name": "Arches Conference Room",
           "notes": "",
-          "paints": [],
+          "paints": [
+            {
+              "inventoryId": "INV-AG6FZX"
+            }
+          ],
           "primaryPaintId": null,
           "points": [
             {
