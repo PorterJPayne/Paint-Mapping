@@ -167,13 +167,13 @@
         {
           "id": "0157933d-e38a-4801-ad07-9b356cf761ec",
           "name": "Basecamp 4",
-          "notes": "",
+          "notes": "Not Confirmed Color.",
           "paints": [
             {
               "inventoryId": "INV-TAU85X"
             }
           ],
-          "primaryPaintId": null,
+          "primaryPaintId": "INV-TAU85X",
           "points": [
             {
               "x": 1326.7975240663304,
