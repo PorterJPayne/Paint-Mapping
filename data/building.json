@@ -12,6 +12,19 @@
       "lowStock": "",
       "location": "",
       "notes": ""
+    },
+    {
+      "inventoryId": "INV-Z9VGQG",
+      "color": "Green Tea Leaf",
+      "code": "",
+      "kilnSpec": "",
+      "brand": "",
+      "finish": "",
+      "hex": "#929988",
+      "quantity": "",
+      "lowStock": "",
+      "location": "",
+      "notes": ""
     }
   ],
   "floors": {
