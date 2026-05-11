@@ -308,13 +308,13 @@
         {
           "id": "eec1272f-4e18-4f04-b94b-90e554db8ef8",
           "name": "Basecamp 3",
-          "notes": "",
+          "notes": "Not Confirmed Color.",
           "paints": [
             {
               "inventoryId": "INV-TAU85X"
             }
           ],
-          "primaryPaintId": null,
+          "primaryPaintId": "INV-TAU85X",
           "points": [
             {
               "x": 1581.5265041961268,
