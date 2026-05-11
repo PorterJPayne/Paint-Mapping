@@ -38,6 +38,19 @@
       "lowStock": "",
       "location": "",
       "notes": ""
+    },
+    {
+      "inventoryId": "INV-IO200I",
+      "color": "",
+      "code": "",
+      "kilnSpec": "",
+      "brand": "",
+      "finish": "",
+      "hex": "#cccccc",
+      "quantity": "",
+      "lowStock": "",
+      "location": "",
+      "notes": ""
     }
   ],
   "floors": {
