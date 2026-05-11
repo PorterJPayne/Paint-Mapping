@@ -168,7 +168,11 @@
           "id": "0157933d-e38a-4801-ad07-9b356cf761ec",
           "name": "Basecamp 4",
           "notes": "",
-          "paints": [],
+          "paints": [
+            {
+              "inventoryId": "INV-TAU85X"
+            }
+          ],
           "primaryPaintId": null,
           "points": [
             {
