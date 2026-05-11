@@ -130,13 +130,13 @@
         {
           "id": "2ec5bd07-fd82-4cc6-8e83-bc057d1e2fa4",
           "name": "Community Entryway",
-          "notes": "",
+          "notes": "Confirmed Color. Unknown if its a kiln color.",
           "paints": [
             {
               "inventoryId": "INV-PJQQ3T"
             }
           ],
-          "primaryPaintId": null,
+          "primaryPaintId": "INV-PJQQ3T",
           "points": [
             {
               "x": 1118.1730342558794,
