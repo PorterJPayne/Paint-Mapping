@@ -280,7 +280,11 @@
           "id": "c876be71-c780-4cf1-9366-231562caf430",
           "name": "Community Area Walls",
           "notes": "",
-          "paints": [],
+          "paints": [
+            {
+              "inventoryId": "INV-Z9VGQG"
+            }
+          ],
           "primaryPaintId": null,
           "points": [
             {
