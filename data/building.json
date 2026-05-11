@@ -85,13 +85,13 @@
         {
           "id": "55084f55-4b72-4eb1-858a-4502ea7cc9f3",
           "name": "Cafe",
-          "notes": "This is a test",
+          "notes": "Confirmed Color.",
           "paints": [
             {
               "inventoryId": "INV-IO200I"
             }
           ],
-          "primaryPaintId": null,
+          "primaryPaintId": "INV-IO200I",
           "points": [
             {
               "x": 903.8901601830663,
