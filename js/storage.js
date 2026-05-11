@@ -1,113 +1,72 @@
 const STORAGE_KEY =
   "paintMapData";
 
-function saveData(){
+let saveTimeout =
+  null;
 
-  try{
+// SAVE
 
-    // LOCAL SAVE FIRST
+async function saveData(){
 
-    localStorage.setItem(
+  clearTimeout(
+    saveTimeout
+  );
 
-      STORAGE_KEY,
+  saveTimeout =
+    setTimeout(
+      async ()=>{
 
-      JSON.stringify(
-        buildingData
-      )
+        try{
 
+          const response =
+            await fetch(
+              "/api/save",
+              {
+
+                method:"POST",
+
+                headers:{
+                  "Content-Type":
+                    "application/json"
+                },
+
+                body:JSON.stringify(
+                  buildingData
+                )
+
+              }
+            );
+
+          if(!response.ok){
+
+            throw new Error(
+              "Save request failed"
+            );
+
+          }
+
+          console.log(
+            "Cloud save success"
+          );
+
+        }
+
+        catch(error){
+
+          console.error(
+            "Cloud save failed",
+            error
+          );
+
+        }
+
+      },
+      300
     );
-
-    // OPTIONAL CLOUD SAVE
-
-    saveCloudData();
-
-  }
-
-  catch(error){
-
-    console.error(
-      "Save failed",
-      error
-    );
-
-  }
 
 }
 
-function loadData(){
-
-  try{
-
-    const raw =
-      localStorage.getItem(
-        STORAGE_KEY
-      );
-
-    if(!raw) return;
-
-    const parsed =
-      JSON.parse(raw);
-
-    // BASIC VALIDATION
-
-    if(
-      parsed &&
-      parsed.floors &&
-      parsed.inventory
-    ){
-
-      buildingData =
-        parsed;
-
-    }
-
-  }
-
-  catch(error){
-
-    console.error(
-      "Load failed",
-      error
-    );
-
-  }
-
-}
-
-async function saveCloudData(){
-
-  try{
-
-    await fetch(
-      "/api/save",
-      {
-
-        method:"POST",
-
-        headers:{
-          "Content-Type":
-            "application/json"
-        },
-
-        body:JSON.stringify(
-          buildingData
-        )
-
-      }
-    );
-
-  }
-
-  catch(error){
-
-    console.error(
-      "Cloud save failed",
-      error
-    );
-
-  }
-
-}
+// LOAD
 
 async function loadCloudData(){
 
@@ -118,30 +77,33 @@ async function loadCloudData(){
         "/api/load"
       );
 
-    if(
-      !response.ok
-    ) return;
+    if(!response.ok){
+
+      throw new Error(
+        "Cloud load failed"
+      );
+
+    }
 
     const data =
       await response.json();
 
     if(
-      data &&
-      data.floors &&
-      data.inventory
+      !data ||
+      !data.floors
     ){
 
-      buildingData = data;
-
-      localStorage.setItem(
-
-        STORAGE_KEY,
-
-        JSON.stringify(data)
-
+      throw new Error(
+        "Invalid cloud data"
       );
 
     }
+
+    buildingData = data;
+
+    console.log(
+      "Cloud load success"
+    );
 
   }
 
@@ -156,6 +118,51 @@ async function loadCloudData(){
 
 }
 
-// LOAD LOCAL IMMEDIATELY
+// FORCE SAVE
 
-loadData();
+async function forceSave(){
+
+  try{
+
+    const response =
+      await fetch(
+        "/api/save",
+        {
+
+          method:"POST",
+
+          headers:{
+            "Content-Type":
+              "application/json"
+          },
+
+          body:JSON.stringify(
+            buildingData
+          )
+
+        }
+      );
+
+    if(!response.ok){
+
+      throw new Error(
+        "Force save failed"
+      );
+
+    }
+
+    console.log(
+      "Force save success"
+    );
+
+  }
+
+  catch(error){
+
+    console.error(
+      error
+    );
+
+  }
+
+}
