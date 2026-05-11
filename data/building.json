@@ -222,7 +222,11 @@
           "id": "995c9ddc-ddac-4c13-a682-3a373ba26562",
           "name": "Silver Lake Conference Room",
           "notes": "",
-          "paints": [],
+          "paints": [
+            {
+              "inventoryId": "INV-IO200I"
+            }
+          ],
           "primaryPaintId": null,
           "points": [
             {
