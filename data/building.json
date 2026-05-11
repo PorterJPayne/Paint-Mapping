@@ -227,7 +227,7 @@
               "inventoryId": "INV-IO200I"
             }
           ],
-          "primaryPaintId": null,
+          "primaryPaintId": "INV-IO200I",
           "points": [
             {
               "x": 1580.9041301387756,
