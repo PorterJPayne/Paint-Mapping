@@ -86,7 +86,11 @@
           "id": "55084f55-4b72-4eb1-858a-4502ea7cc9f3",
           "name": "Cafe",
           "notes": "This is a test",
-          "paints": [],
+          "paints": [
+            {
+              "inventoryId": "INV-IO200I"
+            }
+          ],
           "primaryPaintId": null,
           "points": [
             {
