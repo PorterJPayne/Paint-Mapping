@@ -338,7 +338,11 @@
           "id": "479c7d2a-091f-4742-a682-6d48a0abec16",
           "name": "Whiteboard room 2",
           "notes": "",
-          "paints": [],
+          "paints": [
+            {
+              "inventoryId": "INV-PJQQ3T"
+            }
+          ],
           "primaryPaintId": null,
           "points": [
             {
