@@ -29,14 +29,14 @@
     {
       "inventoryId": "INV-9WK7ER",
       "color": "Pure White",
-      "code": "",
-      "kilnSpec": "",
-      "brand": "",
-      "finish": "",
+      "code": "SW7005",
+      "kilnSpec": "KP001",
+      "brand": "Sherwin Williams",
+      "finish": "Eggshell",
       "hex": "#EDEBE5",
-      "quantity": "",
-      "lowStock": "",
-      "location": "",
+      "quantity": "1",
+      "lowStock": "0",
+      "location": "Lehi 1 Storage",
       "notes": ""
     },
     {
