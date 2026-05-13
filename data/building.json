@@ -3,14 +3,14 @@
     {
       "inventoryId": "INV-AG6FZX",
       "color": "Castilian Pink",
-      "code": "",
-      "kilnSpec": "",
-      "brand": "",
-      "finish": "",
+      "code": "S170-3",
+      "kilnSpec": "KP003",
+      "brand": "Behr",
+      "finish": "Eggshell",
       "hex": "#D3B2A9",
-      "quantity": "",
-      "lowStock": "",
-      "location": "",
+      "quantity": "2",
+      "lowStock": "0",
+      "location": "Lehi 1 Storage",
       "notes": ""
     },
     {
