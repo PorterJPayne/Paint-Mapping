@@ -554,7 +554,7 @@
               "inventoryId": "INV-AG6FZX"
             }
           ],
-          "primaryPaintId": null,
+          "primaryPaintId": "INV-AG6FZX",
           "points": [
             {
               "x": 413.3866795249444,
