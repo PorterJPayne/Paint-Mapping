@@ -607,7 +607,7 @@
               "inventoryId": "INV-PJQQ3T"
             }
           ],
-          "primaryPaintId": null,
+          "primaryPaintId": "INV-PJQQ3T",
           "points": [
             {
               "x": 1213.4828845724755,
