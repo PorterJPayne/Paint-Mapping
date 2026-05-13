@@ -520,7 +520,11 @@
           "id": "72f12a84-570d-4d87-8a15-a5d76c1ff5a2",
           "name": "Green River Conference Room",
           "notes": "",
-          "paints": [],
+          "paints": [
+            {
+              "inventoryId": "INV-Z9VGQG"
+            }
+          ],
           "primaryPaintId": null,
           "points": [
             {
