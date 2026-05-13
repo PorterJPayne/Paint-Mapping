@@ -602,7 +602,11 @@
           "id": "e6abb9de-fb68-43b7-8938-114e3afc07ca",
           "name": "Maker Space",
           "notes": "",
-          "paints": [],
+          "paints": [
+            {
+              "inventoryId": "INV-PJQQ3T"
+            }
+          ],
           "primaryPaintId": null,
           "points": [
             {
