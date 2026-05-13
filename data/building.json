@@ -16,14 +16,14 @@
     {
       "inventoryId": "INV-Z9VGQG",
       "color": "Green Tea Leaf",
-      "code": "",
-      "kilnSpec": "",
-      "brand": "",
-      "finish": "",
+      "code": "PPG1128-5",
+      "kilnSpec": "KP006",
+      "brand": "PPG",
+      "finish": "Eggshell",
       "hex": "#929988",
-      "quantity": "",
-      "lowStock": "",
-      "location": "",
+      "quantity": "5",
+      "lowStock": "0",
+      "location": "Lehi 1 Storage",
       "notes": ""
     },
     {
