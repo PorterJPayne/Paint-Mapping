@@ -549,7 +549,11 @@
           "id": "363c84b1-3135-4210-a90a-5a101ae67240",
           "name": "Tea Kitchen",
           "notes": "",
-          "paints": [],
+          "paints": [
+            {
+              "inventoryId": "INV-AG6FZX"
+            }
+          ],
           "primaryPaintId": null,
           "points": [
             {
