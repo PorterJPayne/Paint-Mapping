@@ -42,14 +42,14 @@
     {
       "inventoryId": "INV-IO200I",
       "color": "Tempe Star",
-      "code": "",
-      "kilnSpec": "",
-      "brand": "",
-      "finish": "",
+      "code": "SW6229",
+      "kilnSpec": "KP017",
+      "brand": "Sherwin Williams",
+      "finish": "Eggshell",
       "hex": "#466067",
-      "quantity": "",
-      "lowStock": "",
-      "location": "",
+      "quantity": "7",
+      "lowStock": "0",
+      "location": "Lehi 1 storage",
       "notes": ""
     },
     {
